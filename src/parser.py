@@ -1,25 +1,14 @@
 import pickle
 import time
 
-from bs4 import BeautifulSoup as bs
+from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
 import config
 
 
-# driver = webdriver.Chrome(
-#     executable_path="C:\\Users\\TRVL\\PycharmProjects\\TrainingBot\\src\\chromedriver\\chromedriver.exe")
-
-
 class Parser:
-    # __instance__ = None
-    #
-    # def __new__(cls, *args, **kwargs):
-    #     if cls.__instance__ is None:
-    #         cls.__instance__ = super().__new__()
-    #
-    #     return cls.__instance__
 
     def __init__(self, path, username, password):
         self.path = path
@@ -101,7 +90,7 @@ class Parser:
                 count += 1
                 print(count)
 
-            soup = bs(driver.page_source, "html.parser")
+            soup = BeautifulSoup(driver.page_source, "html.parser")
             images = soup.find_all('img',
                                    class_='_2_tDEnGMLxpM6uOa2kaDB3 ImageBox-image media-element _1XWObl-3b9tPy64oaG6fax')
 
@@ -112,8 +101,6 @@ class Parser:
                 img_list.append(image_url)
 
             return img_list
-
-
 
         except Exception as ex:
             print(ex)

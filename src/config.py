@@ -2,7 +2,7 @@ from envparse import env
 
 env.read_envfile()
 
-path = 'src/chromedriver/chromedriver.exe'
+path = 'chromedriver.exe'
 
 TOKEN = env('BOT_TOKEN')
 

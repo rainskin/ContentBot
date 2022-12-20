@@ -1,5 +1,4 @@
-.idea/
 __pycache__/
-test.session
-test.session-journal
+.idea/
+*.session*
 .env
