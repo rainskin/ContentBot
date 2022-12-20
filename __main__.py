@@ -4,14 +4,18 @@ from aiogram import Bot, Dispatcher, types, executor
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
+from aiogram.types import ParseMode
 
 import config
 import texts
 from src import loader, keyboards, image
 from src.chromedriver.class_parser import Parser
+from src.userbot import Userbot
 
 bot = Bot(token=config.TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
+userbot = Userbot()
+
 COMMANDS = [
     types.BotCommand('start', 'Начать'),
     types.BotCommand('setup', 'Установка'),
@@ -24,6 +28,9 @@ COMMANDS = [
 class States(StatesGroup):
     choosing_category = State()
     choosing_amount = State()
+    schedule = State()
+    choosing_days = State()
+    choosing_time = State()
 
 
 @dp.message_handler(commands='start', state='*')
@@ -122,11 +129,6 @@ async def send_photo(message: types.Message, state: FSMContext):
         await state.finish()
 
 
-@dp.message_handler()
-async def help(message: types.Message):
-    await bot.send_message(message.chat.id, texts.commands)
-
-
 @dp.message_handler(commands=["test"])
 async def cmd_test(message: types.Message):
     await message.answer('Тестируемся')
@@ -168,6 +170,66 @@ async def replace_photo(query: types.CallbackQuery):
         await query.answer("Дубль, удалил", show_alert=True)
 
     await query.message.delete()
+
+
+@dp.message_handler(commands=["schedule"])
+async def cmd_schedule(message: types.Message):
+    await message.answer(text=texts.schedule_main, reply_markup=keyboards.channels_kb)
+    await States.schedule.set()
+
+
+@dp.callback_query_handler(state=States.schedule)
+async def chose_category(callback_query: types.CallbackQuery, state: FSMContext):
+    chat = callback_query.data
+    channel_name = ''
+    chat_id = ''
+    if chat == 'anime_tyan':
+        channel_name = 'Аниме тянки'
+        chat_id = config.TYAN_ID
+
+    elif chat == 'yuri':
+        channel_name = 'Юри'
+        chat_id = config.YURI_ID
+
+    elif chat == 'cute_pics':
+        channel_name = 'Пикчи для диалогов'
+        chat_id = config.CUTE_PICS_ID
+
+    await state.update_data({'chat': chat, 'chat_id': chat_id})
+    await bot.send_message(callback_query.message.chat.id, f'Ты выбрал канал *{channel_name}*',
+                           parse_mode=ParseMode.MARKDOWN)
+    await bot.send_message(callback_query.message.chat.id, text=texts.choosing_days, parse_mode=ParseMode.MARKDOWN)
+    await States.choosing_days.set()
+
+
+@dp.message_handler(state=States.choosing_days)
+async def schedule(message: types.Message, state: FSMContext):
+    period = message.text.split(' ')
+    first_day = int(period[0])
+    last_day = int(period[1])
+    days = list(range(first_day, last_day + 1))
+    time = [10, 11, 13]
+    data = await state.get_data()
+    chat = data['chat']
+    chat_id = data['chat_id']
+    collection = ''
+    if chat == 'anime_tyan':
+        collection = loader.ecchi_col
+
+    elif chat == 'yuri':
+        collection = loader.yuri
+
+    elif chat == 'cute_pics':
+        collection = loader.cute_pics
+
+    await userbot.schedule(config.TEST_CHANNEL_ID, collection, days, time)
+    # print(s, type(s))
+
+
+
+@dp.message_handler()
+async def help(message: types.Message):
+    await bot.send_message(message.chat.id, texts.commands)
 
 
 if __name__ == "__main__":

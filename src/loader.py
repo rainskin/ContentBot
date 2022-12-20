@@ -2,6 +2,7 @@ import pymongo
 
 db_client = pymongo.MongoClient()
 images_db = db_client['images']
+
 ecchi_col = images_db['reddit ecchi']
 hentai_coll = images_db['Hentai']
 blacklist = images_db['blacklist']

@@ -25,10 +25,12 @@ class Parser:
         self.path = path
         self.username = username
         self.password = password
-        self.driver = webdriver.Chrome(executable_path=path)
+        self.option = webdriver.ChromeOptions()
+        self.option.add_argument('headless')
+        self.driver = webdriver.Chrome(executable_path=path, chrome_options=self.option)
         self.cookies_file = 'cookies'
 
-    def authorization(self):
+    def authorization(self, path, username, password):
         driver = self.driver
         username = self.username
         password = self.password
@@ -80,7 +82,7 @@ class Parser:
             # Get scroll height
             last_height = driver.execute_script("return document.body.scrollHeight")
 
-            while count != 3:
+            while count != 2:
 
                 # Scroll down to bottom
                 driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
