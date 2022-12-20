@@ -21,7 +21,7 @@ COMMANDS = [
     types.BotCommand('setup', 'Установка'),
     types.BotCommand('pars', 'Начать парсинг'),
     types.BotCommand('show', 'Посмотреть фотки'),
-    types.BotCommand('test', 'тестиров_Очка'),
+    types.BotCommand('test', 'Тестиров_Очка'),
 ]
 
 
@@ -185,7 +185,7 @@ async def chose_category(callback_query: types.CallbackQuery, state: FSMContext)
     chat_id = ''
     if chat == 'anime_tyan':
         channel_name = 'Аниме тянки'
-        chat_id = config.TYAN_ID
+        chat_id = config.ANIME_CHAN_ID
 
     elif chat == 'yuri':
         channel_name = 'Юри'
@@ -226,11 +226,9 @@ async def schedule(message: types.Message, state: FSMContext):
     # print(s, type(s))
 
 
-
 @dp.message_handler()
-async def help(message: types.Message):
+async def send_help(message: types.Message):
     await bot.send_message(message.chat.id, texts.commands)
 
 
-if __name__ == "__main__":
-    executor.start_polling(dp, skip_updates=True)
+executor.start_polling(dp, skip_updates=True)
