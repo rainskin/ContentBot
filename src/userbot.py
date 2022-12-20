@@ -1,11 +1,11 @@
 from _datetime import datetime
 from random import randint
-from typing import Union
 
 import pyrogram
 from pyrogram.enums import ParseMode
 
 import config
+
 
 # name: str, api_id: Union[int, str] = None, api_hash: str = None
 class Userbot:
@@ -28,8 +28,7 @@ class Userbot:
                 print(img)
 
                 await app.send_photo(chat_id=chat_id, parse_mode=ParseMode.MARKDOWN, photo=img,
-                               schedule_date=data)
-
+                                     schedule_date=data)
 
 # app = pyrogram.Client('../userbot', config.API_ID, config.API_HASH)
 
