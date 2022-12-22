@@ -21,3 +21,12 @@ yuri = InlineKeyboardButton('Юри', callback_data='yuri')
 cute_pics = InlineKeyboardButton('Пикчи для диалогов', callback_data='cute_pics')
 # Клавиатура с каналами
 channels_kb = InlineKeyboardMarkup(row_width=1).add(anime_tyan, yuri, cute_pics)
+
+# Выбор времени для отложки
+time_3 = InlineKeyboardButton('8, 14, 20', callback_data='time_3')
+time_4 = InlineKeyboardButton('10, 14, 18, 20', callback_data='time_4')
+time_5 = InlineKeyboardButton('10, 13, 16, 19, 22', callback_data='time_5')
+choose_time_kb = InlineKeyboardMarkup(row_width=1).add(time_3, time_4, time_5)
+
+accept_btn = InlineKeyboardButton('Начать планирование', callback_data='accept')
+finish_schedule_kb = InlineKeyboardMarkup().add(accept_btn)

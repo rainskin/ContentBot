@@ -5,6 +5,7 @@ import pyrogram
 from pyrogram.enums import ParseMode
 
 import config
+import loader
 
 
 # name: str, api_id: Union[int, str] = None, api_hash: str = None
@@ -13,21 +14,25 @@ class Userbot:
     def __init__(self):
         self.app = pyrogram.Client('../userbot', config.API_ID, config.API_HASH)
 
-    async def schedule(self, chat_id, collection, days: list, time_slots: list):
+    async def schedule(self, chat_id, collection, days: list, time_slots: list, search_parameter, caption, blacklist: bool):
         app = self.app
-        await app.start()
+        try:
+            await app.start()
+        except ConnectionError:
+            print('Уже подключен')
         # Для соло пикч
-        print('sssdds', collection, type(collection))
+        search_parameter = search_parameter
         for day in days:  # Дни (список)
             for time in time_slots:  # Время
                 data = datetime(year=datetime.now().year, month=datetime.now().month, day=day, hour=time,
                                 minute=randint(0, 10))
-                img = collection.find_one()['url']
-                # loader.blacklist.insert_one({'url': img})
-                # collection.delete_one({'id': img})
-                print(img)
+                img = collection.find_one()[search_parameter]
 
-                await app.send_photo(chat_id=chat_id, parse_mode=ParseMode.MARKDOWN, photo=img,
+                if blacklist == True:
+                    loader.blacklist.insert_one({'url': img})
+                collection.delete_one({search_parameter: img})
+
+                await app.send_photo(chat_id=chat_id, caption=caption, parse_mode=ParseMode.MARKDOWN, photo=img,
                                      schedule_date=data)
 
 # app = pyrogram.Client('../userbot', config.API_ID, config.API_HASH)
@@ -37,10 +42,6 @@ class Userbot:
 # time_4 = [10, 14, 18, 22]
 # time_3 = [8, 14, 20]
 # days = list(range(20, 27))
-
-# caption_tyan = '__Channel:__ **[@anime4_tyan](https://t.me/+H2QjcBkVtcs4ZDNi)**'
-# caption_yuri = '🎀 **[Yuri arts](https://t.me/+NTDsUr6Stvs3OWZi)**'
-
 
 # @app.on_message(filters.chat(-1001862978453))
 # def add_picture(_, msg: types.Message):

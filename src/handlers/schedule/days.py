@@ -1,29 +1,40 @@
+from datetime import datetime
+from calendar import monthrange
+
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-import config
-from loader import dp, ecchi_col, yuri, cute_pics, userbot
+import keyboards
+from loader import dp, bot
 from states import States
 
 
 @dp.message_handler(state=States.choosing_days)
 async def schedule(message: types.Message, state: FSMContext):
-    period = message.text.split(' ')
-    first_day = int(period[0])
-    last_day = int(period[1])
-    days = list(range(first_day, last_day + 1))
-    time = [10, 11, 13]
-    data = await state.get_data()
-    chat = data['chat']
-    chat_id = data['chat_id']
-    collection = ''
-    if chat == 'anime_tyan':
-        collection = ecchi_col
+    try:
+        period = message.text.split()
+        first_day = int(period[0])
+        last_day = int(period[1])
 
-    elif chat == 'yuri':
-        collection = yuri
+    except (ValueError, IndexError):
+        await bot.send_message(message.chat.id, 'Введи две даты через пробел')
+        return
 
-    elif chat == 'cute_pics':
-        collection = cute_pics
+    current_day = datetime.today().day
+    current_year = datetime.now().year
+    current_month = datetime.now().month
 
-    await userbot.schedule(config.TEST_CHANNEL_ID, collection, days, time)
+    number_of_days_in_a_month = monthrange(current_year, current_month)[1]
+
+    print(number_of_days_in_a_month)
+
+    if first_day < current_day:
+        await bot.send_message(message.chat.id, 'Нельзя запланировать на прошедшую дату')
+    elif last_day > number_of_days_in_a_month:
+        await bot.send_message(message.chat.id, f'Нельзя запланировать на {last_day} число.\n\nВ текущем месяце {number_of_days_in_a_month} дней')
+    else:
+        days = list(range(first_day, last_day + 1))
+        await state.update_data(days=days)
+        await bot.send_message(message.chat.id, F'Выбраны даты с {first_day} по {last_day}')
+        await bot.send_message(message.chat.id,'Теперь выбери время', reply_markup=keyboards.choose_time_kb)
+        await States.choosing_time.set()
