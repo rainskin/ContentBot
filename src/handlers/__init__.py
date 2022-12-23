@@ -5,5 +5,6 @@ def setup():
     from . import show
     from . import test
     from . import schedule
+    from . import upload
 
     from . import text

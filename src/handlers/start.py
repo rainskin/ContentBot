@@ -7,9 +7,11 @@ from loader import dp
 COMMANDS = [
     types.BotCommand('start', 'Начать'),
     types.BotCommand('auth', 'Авторизация'),
-    types.BotCommand('pars', 'Начать парсинг'),
+    types.BotCommand('parse', 'Начать парсинг'),
     types.BotCommand('show', 'Посмотреть фотки'),
     types.BotCommand('test', 'Тестиров_Очка'),
+    types.BotCommand('upload', 'Загрузить контент'),
+    types.BotCommand('schedule', 'Запланировать посты')
 ]
 
 

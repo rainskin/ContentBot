@@ -6,6 +6,9 @@ class States(StatesGroup):
     choosing_category = State()
     choosing_amount = State()
 
+    # Загрузка контента
+    upload_channel = State()
+
     # Отложка
     schedule = State()
     choosing_days = State()
