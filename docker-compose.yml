@@ -1,6 +1,6 @@
 services:
-  main:
-    build: .
+  app:
+    build: src
     restart: always
     environment:
       TZ: Europe/Moscow
