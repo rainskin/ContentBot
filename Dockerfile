@@ -8,4 +8,4 @@ RUN pip install poetry && poetry install
 
 COPY . .
 
-CMD poetry run python
+CMD poetry run python src
