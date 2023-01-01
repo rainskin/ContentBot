@@ -5,7 +5,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import config
 import userbot
 
-db_client = pymongo.MongoClient()
+db_client = pymongo.MongoClient(config.SERVER_IP, username='root',  password=config.MONGO_PASSWORD, authSource='admin')
 images_db = db_client['images']
 
 ecchi_col = images_db['reddit ecchi']

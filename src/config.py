@@ -2,6 +2,9 @@ from core.env import env
 
 TOKEN = env.get('BOT_TOKEN')
 
+SERVER_IP = env.get('SERVER_IP')
+MONGO_PASSWORD = env.get('MONGO_PASSWORD')
+
 login_page = "https://www.reddit.com/login/?dest=https%3A%2F%2Fwww.reddit.com%2Fr%2Fecchi%2F"
 username = env.get('REDDIT_USERNAME')
 password = env.get('REDDIT_PASSWORD')
