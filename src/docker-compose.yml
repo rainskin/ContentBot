@@ -1,0 +1,6 @@
+services:
+  main:
+    build: .
+    restart: always
+    environment:
+      TZ: Europe/Moscow

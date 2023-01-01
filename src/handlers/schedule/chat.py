@@ -24,6 +24,26 @@ async def chose_category(callback_query: types.CallbackQuery, state: FSMContext)
         channel_name = 'Пикчи для диалогов'
         chat_id = config.CUTE_PICS_ID
 
+    elif chat == 'avatars':
+        channel_name = 'Крутые авы'
+        chat_id = config.AVATARS_ID
+
+    elif chat == 'bubblekum':
+        channel_name = 'Баблкам'
+        chat_id = config.BUBBLEKUM_ID
+
+    elif chat == 'irl_characters':
+        channel_name = 'Вымышленные персонажи'
+        chat_id = config.IRL_ID
+
+    elif chat == 'zxc':
+        channel_name = 'ZXC Авы'
+        chat_id = config.ZXC_ID
+
+    elif chat == 'hentai':
+        channel_name = 'Хентай'
+        chat_id = config.HENTAI_ID
+
     await state.update_data({'chat': chat, 'chat_id': chat_id})
     await bot.send_message(callback_query.message.chat.id, f'Ты выбрал канал *{channel_name}*',
                            parse_mode=types.ParseMode.MARKDOWN)

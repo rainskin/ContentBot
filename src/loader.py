@@ -17,6 +17,8 @@ irl_pics = images_db['irl_pics']
 zxc = images_db['ZXC']
 yuri = images_db['yuri']
 bubblecum = images_db['bubblecum']
+other_channels = images_db['other_channels']
+
 
 bot = Bot(token=config.TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())

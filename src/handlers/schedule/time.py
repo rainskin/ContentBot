@@ -10,6 +10,9 @@ from states import States
 async def choosing_time(callback_query: types.CallbackQuery, state: FSMContext):
     data = callback_query.data
     time = []
+
+    if data == 'time_2':
+        time = [8, 20]
     if data == 'time_3':
         time = [8, 14, 20]
     elif data == 'time_4':

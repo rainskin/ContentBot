@@ -8,6 +8,7 @@ class States(StatesGroup):
 
     # Загрузка контента
     upload_channel = State()
+    collect_pictures = State()
 
     # Отложка
     schedule = State()

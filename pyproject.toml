@@ -8,12 +8,12 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 aiogram = "^2.23.1"
-selenium = "3.141.0"
 beautifulsoup4 = "^4.11.1"
 envparse = "^0.2.0"
 pymongo = "^4.3.3"
 pyrogram = "^2.0.69"
 tgcrypto = "^1.2.5"
+httpx = "^0.23.1"
 
 
 [build-system]
