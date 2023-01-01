@@ -1,4 +1,4 @@
-from src import loader
+import loader
 
 
 def is_new(url):
@@ -7,4 +7,3 @@ def is_new(url):
         return True
     else:
         return False
-

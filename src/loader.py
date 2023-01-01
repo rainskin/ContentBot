@@ -3,7 +3,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 import config
-from src import userbot
+import userbot
 
 db_client = pymongo.MongoClient()
 images_db = db_client['images']
@@ -18,7 +18,6 @@ zxc = images_db['ZXC']
 yuri = images_db['yuri']
 bubblecum = images_db['bubblecum']
 other_channels = images_db['other_channels']
-
 
 bot = Bot(token=config.TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
