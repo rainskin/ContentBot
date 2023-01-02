@@ -5,10 +5,6 @@ import config
 import loader
 
 
-# app = pyrogram.Client('../userbot', config.API_ID, config.API_HASH)
-
-
-# name: str, api_id: Union[int, str] = None, api_hash: str = None
 class Userbot:
 
     def __init__(self):
