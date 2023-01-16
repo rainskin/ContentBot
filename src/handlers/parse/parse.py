@@ -1,6 +1,7 @@
 import asyncio
 
 from aiogram import types
+from aiogram.utils.exceptions import WrongFileIdentifier
 
 import keyboards
 import lib
@@ -14,9 +15,12 @@ async def _(query: types.CallbackQuery):
     processed_pictures = []
 
     for i in pictures:
-        await bot.send_photo(query.message.chat.id, photo=i, caption=i,
-                             reply_markup=keyboards.photo_kb)
-        processed_pictures.append(i)
+        try:
+            await bot.send_photo(query.message.chat.id, photo=i, caption=i, reply_markup=keyboards.photo_kb)
+        except WrongFileIdentifier:
+            await query.message.answer(f'Я обосрался {i}')
+        else:
+            processed_pictures.append(i)
         await asyncio.sleep(0.1)
 
     lib.pictures.save(processed_pictures)
