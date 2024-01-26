@@ -1,24 +1,26 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-import config
+import texts
+from config import UPLOAD_CHANNEL_ID
 import keyboards
-from loader import dp, bot
+from loader import dp, list_of_admins, bot
 from states import States
+from utils.check_admin_rights import is_superadmin
 
 
 @dp.message_handler(commands='upload', state='*')
 async def cmd_upload(msg: types.Message, state: FSMContext):
-    if msg.from_user.id != 936845322:
+
+    if not is_superadmin(msg.from_user.id):
         await msg.answer('Нет доступа')
-    else:
-        if msg.from_user.id != 936845322:
-            await msg.answer('Нет доступа')
-        else:
-            if msg.chat.id != -1001723603976:
-                await msg.answer(f'Загружать контент нужно в специальном канале: {config.UPLOAD_CHANNEL_LINK}')
-            else:
-                await state.finish()
-                await bot.send_message(msg.chat.id, 'Выбери канал для загрузки контента', reply_markup=keyboards.channels_kb)
-                await States.upload_channel.set()
+        return
+
+    if msg.chat.id != UPLOAD_CHANNEL_ID:
+        await msg.answer(texts.schedule_start_command, disable_web_page_preview=True)
+        return
+
+    await state.finish()
+    await bot.send_message(msg.chat.id, 'Выбери канал для загрузки контента', reply_markup=keyboards.Channels())
+    await States.upload_channel.set()
 

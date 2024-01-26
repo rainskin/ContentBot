@@ -45,6 +45,3 @@ async def send_photo(message: types.Message, state: FSMContext):
 async def exception_handler(update: types.Update, exception: exceptions.RetryAfter):
     await asyncio.sleep(0.3)
     # await update.message.answer('Флуд контроль')
-    print('s')
-    print(update)
-    print(exception.timeout)

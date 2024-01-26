@@ -1,37 +1,88 @@
+from datetime import datetime
+from typing import Any, Iterable, cast
+
 import pyrogram
+from pyrogram import errors
 from pyrogram.enums import ParseMode
+from pyrogram.raw.functions.messages.forward_messages import ForwardMessages
+from pyrogram.raw.types import (
+    UpdateNewChannelMessage,
+    UpdateNewMessage,
+    UpdateNewScheduledMessage,
+)
+from pyrogram.types import Message
+from pyrogram.types.list import List
+from pyrogram.utils import datetime_to_timestamp
 
 import config
 import loader
 
 
-class Userbot:
+class Client(pyrogram.Client):
+    def __init__(self, session_string: str):
+        super().__init__('userbot', session_string=session_string)  # type: ignore
+
+    async def forward_messages(
+            self,
+            chat_id: int | str,
+            from_chat_id: int | str,
+            message_ids: int | Iterable[int],
+            disable_notification: bool | None = None,
+            schedule_date: datetime | None = None,
+            protect_content: bool | None = None,
+            drop_author: bool | None = None,
+    ) -> Message | list[Message]:
+        is_iterable = not isinstance(message_ids, int)
+        message_ids = list(message_ids) if is_iterable else [message_ids]
+        r: Any = await self.invoke(  # type: ignore
+            ForwardMessages(
+                to_peer=await self.resolve_peer(chat_id),  # type: ignore
+                from_peer=await self.resolve_peer(from_chat_id),  # type: ignore
+                id=message_ids,
+                silent=disable_notification or None,
+                random_id=[self.rnd_id() for _ in message_ids],
+                schedule_date=datetime_to_timestamp(schedule_date),
+                noforwards=protect_content,
+                drop_author=drop_author,
+            )
+        )
+        forwarded_messages: list[Message] = []
+        users = {i.id: i for i in r.users}
+        chats = {i.id: i for i in r.chats}
+        _types = UpdateNewMessage, UpdateNewChannelMessage, UpdateNewScheduledMessage
+        for i in r.updates:
+            if isinstance(i, _types):
+                m = await Message._parse(self, i.message, users, chats)  # type: ignore
+                forwarded_messages.append(cast(Message, m))
+        return List(forwarded_messages) if is_iterable else forwarded_messages[0]
+
+
+class Userbot():
 
     def __init__(self):
-        self.app = pyrogram.Client('../userbot', config.API_ID, config.API_HASH)
+        self.app = Client(session_string=config.CH_SESSION_STRING)
 
-    async def copy(self, chat_id, search_parameter, caption, date):
+    async def copy(self, chat_id, caption, date, msg_id: int):
         app = self.app
         try:
             await app.start()
         except ConnectionError:
             pass
-        search_parameter = search_parameter
 
-        message = loader.other_channels.find_one({'channel': search_parameter})['msg_id']
+        # message = loader.other_channels.find_one({'channel_id': chat_id})['msg_id']
 
         try:
             # Для альбомов
-            await app.copy_media_group(chat_id=chat_id, from_chat_id=-1001723603976, message_id=message,
+            await app.copy_media_group(chat_id=chat_id, from_chat_id=config.UPLOAD_CHANNEL_ID, message_id=msg_id,
                                        captions=caption,
                                        schedule_date=date)
         except ValueError:
             # Для соло пикч
-            await app.copy_message(chat_id=chat_id, from_chat_id=-1001723603976, message_id=message,
+            await app.copy_message(chat_id=chat_id, from_chat_id=config.UPLOAD_CHANNEL_ID, message_id=msg_id,
                                    caption=caption,
                                    schedule_date=date)
 
-        loader.other_channels.delete_one({'msg_id': message})
+        # loader.other_channels.delete_one({'msg_id': message})
 
     async def schedule(self, chat_id, search_parameter, caption, date, anime_tyan: bool):
 
@@ -56,6 +107,39 @@ class Userbot:
 
         await app.send_photo(chat_id=chat_id, caption=caption, parse_mode=ParseMode.MARKDOWN, photo=img,
                              schedule_date=date)
+
+    async def in_chat(self, chat_id):
+
+        app = self.app
+        try:
+            await app.start()
+        except ConnectionError:
+            pass
+
+        try:
+            return await self.app.get_chat(chat_id)
+        except pyrogram.errors.ChannelInvalid:
+            return False
+
+    async def forward_messages(
+            self,
+            chat_id: int | str,
+            from_chat_id: int | str,
+            message_ids: int | Iterable[int],
+            disable_notification: bool | None = None,
+            schedule_date: datetime | None = None,
+            protect_content: bool | None = None,
+            drop_author: bool | None = None,
+    ):
+        app = self.app
+        try:
+            await app.start()
+        except ConnectionError:
+            pass
+
+        await app.forward_messages(chat_id, from_chat_id, message_ids, disable_notification, schedule_date, protect_content, drop_author)
+
+
 
 
 userbot = Userbot()

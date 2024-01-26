@@ -5,20 +5,17 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import config
 import userbot
 
-db_client = pymongo.MongoClient(config.SERVER_IP, username='root',  password=config.MONGO_PASSWORD, authSource='admin')
-images_db = db_client['images']
+db_client = pymongo.MongoClient(config.MONGO_URL)
+images_db = db_client[config.MONGO_DB_NAME]
+list_of_admins = images_db['list of admins']
+list_of_channels = images_db['list of channels']
+ad_posts = images_db['ad posts']
 
 ecchi_col = images_db['reddit ecchi']
 hentai_coll = images_db['Hentai']
 blacklist = images_db['blacklist']
-cute_pics = images_db['Cute_pics']
-avatars = images_db['Avatars']
-irl_pics = images_db['irl_pics']
-zxc = images_db['ZXC']
-yuri = images_db['yuri']
-bubblecum = images_db['bubblecum']
 other_channels = images_db['other_channels']
 
-bot = Bot(token=config.TOKEN)
+bot = Bot(token=config.BOT_TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
 userbot = userbot.Userbot()

@@ -1,12 +1,18 @@
+from config import UPLOAD_CHANNEL_LINK
+
 cmd_start_text = """
 Привет! Поработаем?
 
-/setup - установка
 /parse - начать парсинг пикч для Аниме Тянок
 /show - посмотреть загруженные пикчи
 
+/channels - управление каналами
+/admins - управление админами
+
 /upload загрузка контента
+
 /schedule - запланировать публикации
+/ad_schedule отложить рекламный пост
 """
 
 commands = """
@@ -19,9 +25,17 @@ commands = """
 /show - посмотреть фотки
 /upload загрузка контента
 
+/channels - управление каналами
+/admins - управление админами
+
 /schedule - запланировать публикации
+/ad_schedule отложить рекламный пост
 
 /test - ну просто :)
+"""
+
+schedule_start_command = f"""
+Загружать контент нужно в специальном канале: {UPLOAD_CHANNEL_LINK}
 """
 
 schedule_main = """

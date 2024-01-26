@@ -9,7 +9,36 @@ from states import States
 from userbot import userbot
 
 
-@dp.message_handler(state=States.collect_pictures, content_types=['photo'])
+@dp.message_handler(state=States.collect_pictures, text="Готово")
+async def _(msg: types.Message, state: FSMContext):
+    data = await state.get_data()
+    print(data)
+
+    if 'message_ids' in data:
+        photos = data['message_ids']
+        channel_name = data['channel_name']
+        channel_id = data['channel_id']
+        number_of_photos = len(photos)
+        await bot.send_message(msg.chat.id, f'Получено постов: {number_of_photos}\nНачинаю загрузку',
+                               reply_markup=keyboards.remove)
+
+        for photo in photos:
+            item = {
+                'msg_id': photo,
+                'channel_name': channel_name,
+                'channel_id': channel_id
+            }
+            loader.other_channels.insert_one(item)
+
+        await bot.send_message(msg.chat.id, 'Загружено в базу данных')
+        await state.finish()
+
+    else:
+        await bot.send_message(msg.chat.id, 'Сначала отправь посты для загрузки')
+
+
+
+@dp.message_handler(state=States.collect_pictures, content_types='any')
 async def _(msg: types.Message, state: FSMContext):
     data = await state.get_data()
     message_ids = data.get('message_ids', [])
@@ -36,32 +65,3 @@ async def _(msg: types.Message, state: FSMContext):
         # data = await state.get_data()
         message_ids = data.get('message_ids', [])
         await state.update_data(message_ids=message_ids + [new_message_id])
-
-
-@dp.message_handler(state=States.collect_pictures)
-async def _(msg: types.Message, state: FSMContext):
-    data = await state.get_data()
-
-    if msg.text == 'Готово':
-        if 'message_ids' in data:
-            photos = data['message_ids']
-            chat_name = data['chat_name']
-            number_of_photos = len(photos)
-            await bot.send_message(msg.chat.id, f'Получено постов: {number_of_photos}\nНачинаю загрузку',
-                                   reply_markup=keyboards.remove)
-
-            for photo in photos:
-                item = {
-                    'msg_id': photo,
-                    'channel': chat_name
-                }
-                loader.other_channels.insert_one(item)
-
-            await bot.send_message(msg.chat.id, 'Загружено в базу данных')
-            await state.finish()
-
-        else:
-            await bot.send_message(msg.chat.id, 'Сначала отправь фото для загрузки')
-
-    else:
-        await bot.send_message(msg.chat.id, 'Отправляй пикчи прямо сюда')
