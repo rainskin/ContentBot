@@ -27,8 +27,11 @@ def create_valid_date(day: int) -> datetime:
     than or equal to the current day, the function returns a date within the current month. If the day is less than
     the current day, it returns a date in the next month or the next year if the current month is December."""
 
-    if day >= current_day:
+    if day > current_day:
         return datetime(year=current_year, month=current_month, day=day)
+
+    if day == current_day:
+        return datetime(year=current_year, month=current_month, day=current_day)
 
     if current_month == 12:
         month = 1
