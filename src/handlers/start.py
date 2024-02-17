@@ -4,8 +4,9 @@ from aiogram.types import bot_command_scope
 
 import keyboards
 import texts
+from config import SALE_GROUP_ID
 from loader import dp
-from utils.check_admin_rights import is_admin
+from utils.check_admin_rights import is_admin, is_superadmin
 
 COMMANDS = [
     types.BotCommand('start', 'Начать'),
@@ -21,8 +22,11 @@ COMMANDS = [
 @dp.message_handler(commands='start', state='*')
 async def cmd_start(msg: types.Message, state: FSMContext):
     if not is_admin(msg.from_user.id):
-        await msg.answer('Нет доступа')
+        return
+
+    if msg.chat.id != SALE_GROUP_ID and is_superadmin(msg.chat.id):
+        await msg.answer(texts.admin_commands, reply_markup=keyboards.remove)
     else:
-        await state.finish()
-        await msg.answer(texts.cmd_start_text, reply_markup=keyboards.remove)
-        await dp.bot.set_my_commands(COMMANDS, scope=bot_command_scope.BotCommandScopeChat(chat_id=936845322))
+        await msg.answer("Бот перезапущен")
+    await state.finish()
+    await dp.bot.set_my_commands(COMMANDS, scope=bot_command_scope.BotCommandScopeChat(chat_id=936845322))

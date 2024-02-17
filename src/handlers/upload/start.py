@@ -13,7 +13,6 @@ from utils.check_admin_rights import is_superadmin
 async def cmd_upload(msg: types.Message, state: FSMContext):
 
     if not is_superadmin(msg.from_user.id):
-        await msg.answer('Нет доступа')
         return
 
     if msg.chat.id != UPLOAD_CHANNEL_ID:
