@@ -13,7 +13,7 @@ from utils.check_admin_rights import is_admin
 
 
 @dp.message_handler(content_types='any')
-async def send_help(msg: types.Message, state: FSMContext):
+async def _(msg: types.Message, state: FSMContext):
 
     if msg.chat.id != SALE_GROUP_ID:
         return

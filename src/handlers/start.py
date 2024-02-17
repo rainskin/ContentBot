@@ -21,8 +21,6 @@ COMMANDS = [
 
 @dp.message_handler(commands='start', state='*')
 async def cmd_start(msg: types.Message, state: FSMContext):
-    if not is_admin(msg.from_user.id):
-        return
 
     if msg.chat.id != SALE_GROUP_ID and is_superadmin(msg.chat.id):
         await msg.answer(texts.admin_commands, reply_markup=keyboards.remove)
