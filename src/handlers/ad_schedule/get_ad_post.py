@@ -1,10 +1,11 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
+import config
 import keyboards
-from loader import dp, bot, list_of_channels
+from loader import dp, userbot, bot
 from states import States
-from utils.check_admin_rights import is_admin
+from utils import links
 
 
 @dp.message_handler(state=States.waiting_ad_post, content_types="any")
@@ -13,36 +14,56 @@ async def _(msg: types.Message, state: FSMContext):
     title = msg_text[0:40] if msg_text else 'Вложение'
 
     data = await state.get_data()
-    message_ids = data.get('message_ids', [])
+    service_msg_id = data.get('service_msg_id')
+    notification = True
+    drop_author = False
 
-    if msg.media_group_id is not None:
-        # data = await state.get_data()
+    if msg.media_group_id:
         group_id_in_data = data.get('group_id')
 
         if group_id_in_data == msg.media_group_id:
-            pass
+            return
 
-        else:
-            group_id = msg.media_group_id
+        group_id = msg.media_group_id
 
-            await state.update_data(group_id=group_id)
-            new_message_id = msg.message_id
-            await state.update_data(message_id=message_ids + [new_message_id])
-            await msg.answer(f'Пост (альбом) <b>"{title}..."</b> принят', parse_mode='html')
-            await msg.answer('Теперь в веди дату и в время через пробел в формате <b>ДАТА ЧАСЫ МИНУТЫ</b>',
-                             parse_mode='html')
+        await state.update_data(group_id=group_id)
+        message_ids = await userbot.get_msg_ids(config.UPLOAD_CHANNEL_ID, msg.message_id)
+        await state.update_data(message_id=message_ids)
+        ad_title_text = f'Пост (альбом) <b>"{title}..."</b> принят'
+        ad_title_msg = await msg.answer(ad_title_text,
+                                        reply_markup=keyboards.AdPostSettings(drop_author=drop_author,
+                                                                              notification=notification),
+                                        parse_mode='html', disable_web_page_preview=True)
 
     else:
 
-        new_message_id = msg.message_id
-        message_id = data.get('message_ids')
-        await state.update_data(message_id=message_ids + [new_message_id])
-        await msg.answer(f'Пост <b>"{title}..."</b> принят', parse_mode='html')
-        await msg.answer('Теперь в веди дату и в время через пробел в формате <b>ДАТА ЧАСЫ МИНУТЫ</b>',
-                         parse_mode='html')
+        await state.update_data(message_id=msg.message_id)
+        ad_title_text = f'Пост <b>"{title}..."</b> принят'
+        ad_title_msg = await msg.answer(ad_title_text, parse_mode='html',
+                                        reply_markup=keyboards.AdPostSettings(drop_author=drop_author,
+                                                                              notification=notification),
+                                        disable_web_page_preview=True)
+
+    link = await links.get_links_from_msg(msg)
+    await state.update_data(drop_author=drop_author, notification=notification, link=link, title=title, ad_title_msg_id=ad_title_msg.message_id,
+                            ad_title_text=ad_title_text)
+    await bot.delete_message(msg.chat.id, service_msg_id)
+    await States.schedule_ad.set()
 
 
-    await States.choose_ad_date.set()
+@dp.callback_query_handler(state=States.schedule_ad)
+async def toggle_notification(query: types.CallbackQuery, state: FSMContext):
+    text = query.data
 
+    data = await state.get_data()
+    drop_author = data['drop_author']
+    notification = data['notification']
 
-content_types = ["text", "sticker", "voice", "photo", "poll", "video_note"]
+    if text == 'toggle_notification':
+        notification = not notification
+    elif text == 'toggle_author':
+        drop_author = not drop_author
+
+    await state.update_data(drop_author=drop_author, notification=notification)
+    await query.message.edit_reply_markup(keyboards.AdPostSettings(drop_author=drop_author, notification=notification))
+    await query.answer()

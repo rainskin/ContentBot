@@ -7,6 +7,7 @@ def setup():
     from . import upload
     from . import add_admin
     from . import channels
+    from . import add_sale
     from . import ad_schedule
 
     from . import text

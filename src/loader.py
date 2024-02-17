@@ -9,7 +9,7 @@ db_client = pymongo.MongoClient(config.MONGO_URL)
 images_db = db_client[config.MONGO_DB_NAME]
 list_of_admins = images_db['list of admins']
 list_of_channels = images_db['list of channels']
-ad_posts = images_db['ad posts']
+sales = images_db['sales']
 
 ecchi_col = images_db['reddit ecchi']
 hentai_coll = images_db['Hentai']

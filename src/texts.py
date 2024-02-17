@@ -15,7 +15,7 @@ cmd_start_text = """
 /ad_schedule отложить рекламный пост
 """
 
-commands = """
+admin_commands = """
 Забыл команды? 
 
 /start - если вдруг ты хочешь начать все заново

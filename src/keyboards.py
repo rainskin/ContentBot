@@ -18,10 +18,9 @@ category_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).
 
 remove = ReplyKeyboardRemove()
 
-
 # Выбор времени для отложки
-time_2 = InlineKeyboardButton('8, 20', callback_data='8, 20')
-time_3 = InlineKeyboardButton('0, 15, 19', callback_data='0, 15, 19')
+time_2 = InlineKeyboardButton('0, 15, 19', callback_data='0, 15, 19')
+time_3 = InlineKeyboardButton('11, 16, 21 (Alight)', callback_data='11, 16, 21')
 time_4 = InlineKeyboardButton('11, 15, 19, 23', callback_data='11, 15, 19, 23')
 time_5 = InlineKeyboardButton('10, 13, 16, 19, 22', callback_data='10, 13, 16, 19, 22')
 choose_time_kb = InlineKeyboardMarkup(row_width=1).add(time_2, time_3, time_4, time_5)
@@ -108,7 +107,6 @@ class Channels(InlineKeyboardMarkup):
 
 
 class ChannelsWithServiceButtons(Channels, ChannelServiceButtons):
-
     service_buttons = ChannelServiceButtons.buttons
 
     def __init__(self):
@@ -122,3 +120,60 @@ class ChannelsWithServiceButtons(Channels, ChannelServiceButtons):
                 row = []
         if row:
             self.row(*row)
+
+
+class NotificationOn(InlineKeyboardMarkup):
+    button = InlineKeyboardButton('Со звуком: Да', callback_data='notification_yes')
+
+    def __init__(self):
+        super().__init__()
+        self.add(self.button)
+
+
+class NotificationOff(InlineKeyboardMarkup):
+    button = InlineKeyboardButton('Со звуком: Нет', callback_data='notification_no')
+
+    def __init__(self):
+        super().__init__()
+        self.add(self.button)
+
+
+class AdPostSettings(InlineKeyboardMarkup):
+    sound_on = InlineKeyboardButton('🔔 Со звуком: Да', callback_data='toggle_notification')
+    sound_of = InlineKeyboardButton('🔕 Со звуком: Нет', callback_data='toggle_notification')
+    enable_author = InlineKeyboardButton('👤 Репост: Да', callback_data='toggle_author')
+    disable_author = InlineKeyboardButton('Репост: Нет', callback_data='toggle_author')
+
+    start_schedule = InlineKeyboardButton('✅ Запланировать', callback_data='start_schedule')
+    cancel_btn = InlineKeyboardButton('❌ Отменить', callback_data='cancel')
+
+    def __init__(self, drop_author: bool, notification: bool):
+        super().__init__()
+        notification_btn = self.sound_on if notification else self.sound_of
+        author_btn = self.enable_author if drop_author else self.disable_author
+        self.row_width = 2
+        self.add(notification_btn, author_btn, self.start_schedule, self.cancel_btn)
+
+
+class AdDate(InlineKeyboardMarkup):
+    today = InlineKeyboardButton('Сегодня', callback_data='today')
+    tomorrow = InlineKeyboardButton('Завтра', callback_data='tomorrow')
+
+    def __init__(self):
+        super().__init__()
+        self.add(self.today, self.tomorrow)
+
+
+class SaleSettings(InlineKeyboardMarkup):
+    schedule_ad_post = InlineKeyboardButton('🕐 Запланировать пост', callback_data='schedule_ad_post')
+    schedule_additional_ad_post = InlineKeyboardButton('+ Добавить еще пост', callback_data='schedule_additional_ad_post')
+
+    add_sale_info = InlineKeyboardButton('➕ Добавить инф. о продаже', callback_data='add_sale_info')
+    update_sale_info = InlineKeyboardButton('♻️ Обновить инф. о продаже', callback_data='update_sale_info')
+
+    def __init__(self, sale_info=None, ad_is_scheduled=False):
+        super().__init__()
+        sale_info_btn = self.update_sale_info if sale_info else self.add_sale_info
+        schedule_ad_btn = self.schedule_additional_ad_post if ad_is_scheduled else self.schedule_ad_post
+        self.row_width = 1
+        self.add(sale_info_btn, schedule_ad_btn)

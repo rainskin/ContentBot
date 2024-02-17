@@ -42,11 +42,13 @@ async def finish(callback_query: types.CallbackQuery, state: FSMContext):
         collection = loader.hentai_coll
         total_photos_count = collection.count_documents({})
 
-    requested_photos_count = len(days) * len(time)
+    amount_of_days = second_date.day - first_date.day + 1
 
-    if requested_photos_count > total_photos_count:
+    requested_posts_count = amount_of_days * len(time) - calculate_dropped_posts(first_date, time)
+
+    if requested_posts_count > total_photos_count:
         await bot.send_message(callback_query.message.chat.id,
-                               f'В коллекции *{total_photos_count}* ты запросил {requested_photos_count}\nПополни '
+                               f'В коллекции *{total_photos_count}* ты запросил {requested_posts_count}\nПополни '
                                f'коллекцию, либо выбери другие даты',
                                parse_mode=types.ParseMode.MARKDOWN)
     else:
@@ -66,8 +68,8 @@ async def schedule_posts(date: datetime, time: list, channel_name: str, channel_
     month = date.month
     day = date.day
 
-    caption = ''
-
+    caption = None
+    search_parameter = 'url'  # for tyan and vip tyan
     for hour in time:
 
         if date.day == current_day and current_hour > hour:
@@ -77,15 +79,21 @@ async def schedule_posts(date: datetime, time: list, channel_name: str, channel_
         schedule_date = datetime(year=year, month=month, day=day, hour=hour, minute=minute)
 
         if 'anime tyans' in channel_name.lower():
-            search_parameter = 'url'
-            anime_tyan = True
-            caption = '__Channel:__ **[@anime4_tyan](https://t.me/+H2QjcBkVtcs4ZDNi)**'
-            await userbot.schedule(channel_id, search_parameter, caption, schedule_date, anime_tyan)
+            await userbot.schedule(channel_id, search_parameter, caption, schedule_date, anime_tyan=True)
 
         elif 'vip tyan' in channel_name.lower():
-            search_parameter = 'url'
             await userbot.schedule(channel_id, search_parameter, caption, schedule_date, anime_tyan=False)
 
         else:
             await userbot.copy(channel_id, caption, schedule_date)
         await asyncio.sleep(0.1)
+
+
+def calculate_dropped_posts(date: datetime, time: list[int]):
+    dropped_posts = 0
+
+    for hour in time:
+        if date.day == current_day and current_hour > hour:
+            dropped_posts += 1
+
+    return dropped_posts

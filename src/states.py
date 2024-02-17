@@ -31,6 +31,11 @@ class States(StatesGroup):
     # schedule ad
     get_channels_for_ad = State()
     check_channels = State()
+
+    # add_sale
+
     waiting_ad_post = State()
     choose_ad_date = State()
+    choose_ad_time = State()
     schedule_ad = State()
+

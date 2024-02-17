@@ -35,8 +35,8 @@ async def schedule(message: types.Message, state: FSMContext):
     first_date = create_valid_date(first_day)
     second_date = create_valid_date(last_day)
 
-    first_date_str = str(first_date.day) + ' ' + RU_MONTHS_GEN[first_date.month]
-    second_date_str = str(second_date.day) + ' ' + RU_MONTHS_GEN[second_date.month]
+    first_date_str = str(first_date.day) + ' ' + RU_MONTHS_GEN[first_date.month - 1]
+    second_date_str = str(second_date.day) + ' ' + RU_MONTHS_GEN[second_date.month - 1]
 
     if first_day != last_day:
         await bot.send_message(message.chat.id, F'Выбраны даты с <b>{first_date_str}</b> по <b>{second_date_str}</b>', parse_mode='html')

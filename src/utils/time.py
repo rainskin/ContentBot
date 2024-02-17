@@ -11,8 +11,9 @@ from states import States
 
 one_day = timedelta(days=1)
 
-current_hour = datetime.today().hour
-current_day = datetime.today().day
+current_hour = datetime.now().hour
+
+current_day = datetime.now().day
 current_year = datetime.now().year
 current_month = datetime.now().month
 
@@ -21,8 +22,8 @@ number_of_days_in_a_month = monthrange(current_year, current_month)[1]
 test_date_1 = datetime(year=2024, month=current_month, day=current_day, hour=14)
 test_date_2 = datetime(year=2024, month=current_month, day=current_day, hour=15)
 
-def create_valid_date(day: int) -> datetime:
 
+def create_valid_date(day: int) -> datetime:
     """This function takes an integer representing a day and returns a valid date. If the provided day is greater
     than or equal to the current day, the function returns a date within the current month. If the day is less than
     the current day, it returns a date in the next month or the next year if the current month is December."""
@@ -52,15 +53,8 @@ def create_valid_date(day: int) -> datetime:
     return date
 
 
-# # day = int(input("Введи дату 1 "))
-# # day2 = int(input("Введи дату 2 "))
-# if day <= number_of_days_in_a_month:
-#     print(create_valid_date(day))
-#     print(create_valid_date(day2))
-# else:
-#     print('В текущем месяце нет столько дней')
-
-RU_MONTHS_GEN = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"]
+RU_MONTHS_GEN = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября",
+                 "Ноября", "Декабря"]
 
 
 class RUMonths():
@@ -71,3 +65,7 @@ class RUMonths():
         date = str(day) + ' ' + self.months[month - 1]
 
         return date
+
+
+def is_not_correct_time(hours: int, minutes: int):
+    return hours < 0 or hours > 23 or minutes < 0 or minutes > 59

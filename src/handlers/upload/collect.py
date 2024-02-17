@@ -12,7 +12,6 @@ from userbot import userbot
 @dp.message_handler(state=States.collect_pictures, text="Готово")
 async def _(msg: types.Message, state: FSMContext):
     data = await state.get_data()
-    print(data)
 
     if 'message_ids' in data:
         photos = data['message_ids']
@@ -44,7 +43,6 @@ async def _(msg: types.Message, state: FSMContext):
     message_ids = data.get('message_ids', [])
 
     if msg.media_group_id is not None:
-        # data = await state.get_data()
         group_id_in_data = data.get('group_id')
 
         if group_id_in_data == msg.media_group_id:
@@ -56,12 +54,9 @@ async def _(msg: types.Message, state: FSMContext):
             await state.update_data(group_id=group_id)
             new_message_id = msg.message_id
             await state.update_data(message_ids=message_ids + [new_message_id])
-            # print(msg_id)
-            # await userbot.copy_media_group(chat_id=config.TEST_CHANNEL_ID, msg=new_message_id)
 
     else:
 
         new_message_id = msg.message_id
-        # data = await state.get_data()
         message_ids = data.get('message_ids', [])
         await state.update_data(message_ids=message_ids + [new_message_id])
