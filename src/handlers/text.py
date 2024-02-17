@@ -14,11 +14,8 @@ from utils.check_admin_rights import is_admin
 
 @dp.message_handler(content_types='any')
 async def send_help(msg: types.Message, state: FSMContext):
-    if not is_admin(msg.from_user.id):
-        return
 
     if msg.chat.id != SALE_GROUP_ID:
-        await msg.answer(texts.admin_commands)
         return
 
     entities = msg.entities or msg.caption_entities
