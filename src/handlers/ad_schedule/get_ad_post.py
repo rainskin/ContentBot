@@ -27,7 +27,7 @@ async def _(msg: types.Message, state: FSMContext):
         group_id = msg.media_group_id
 
         await state.update_data(group_id=group_id)
-        message_ids = await userbot.get_msg_ids(config.UPLOAD_CHANNEL_ID, msg.message_id)
+        message_ids = await userbot.get_msg_ids(config.SALE_GROUP_ID, msg.message_id)
         await state.update_data(message_id=message_ids)
         ad_title_text = f'Пост (альбом) <b>"{title}..."</b> принят'
         ad_title_msg = await msg.answer(ad_title_text,

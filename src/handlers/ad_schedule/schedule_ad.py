@@ -42,7 +42,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     service_msg = await query.message.answer('...Начинаю планирование')
 
     for channel_id in channel_ids:
-        await userbot.forward_messages(channel_id, config.UPLOAD_CHANNEL_ID, msg_id, schedule_date=schedule_date,
+        await userbot.forward_messages(channel_id, config.SALE_GROUP_ID, msg_id, schedule_date=schedule_date,
                                        drop_author=drop_author, disable_notification=notification)
     await bot.edit_message_reply_markup(query.message.chat.id, sale_msg_id,
                                         reply_markup=keyboards.SaleSettings(ad_is_scheduled=True))
