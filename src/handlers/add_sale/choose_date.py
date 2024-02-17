@@ -23,7 +23,8 @@ async def _(msg: types.Message, state: FSMContext):
         return
 
     text = await get_text_with_valid_date(state, day)
-    await msg.answer(text, parse_mode='html')
+    msg_with_date = await msg.answer(text, parse_mode='html')
+    await state.update_data(msg_with_date_id=msg_with_date.message_id)
     await msg.delete()
 
 
@@ -39,8 +40,8 @@ async def _(query: types.CallbackQuery, state: FSMContext):
         await query.answer('куда ты звонишь сынок')
         return
 
-    text = await get_text_with_valid_date(state, day)
-    msg_with_date = await query.message.answer(text, parse_mode='html')
+    msg_text = await get_text_with_valid_date(state, day)
+    msg_with_date = await query.message.answer(msg_text, parse_mode='html')
     await query.answer()
     await query.message.delete()
     await state.update_data(msg_with_date_id=msg_with_date.message_id)
