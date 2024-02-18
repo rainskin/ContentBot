@@ -5,6 +5,7 @@ import pyrogram
 from pyrogram import errors
 from pyrogram.enums import ParseMode
 from pyrogram.raw.functions.messages.forward_messages import ForwardMessages
+from pyrogram.raw.functions.messages import DeleteScheduledMessages
 from pyrogram.raw.types import (
     UpdateNewChannelMessage,
     UpdateNewMessage,
@@ -56,6 +57,9 @@ class Client(pyrogram.Client):
                 m = await Message._parse(self, i.message, users, chats)  # type: ignore
                 forwarded_messages.append(cast(Message, m))
         return List(forwarded_messages) if is_iterable else forwarded_messages[0]
+
+    async def delete_scheduled_messages(self, chat_id: int, msg_ids):
+        r: Any = await self.invoke(DeleteScheduledMessages(peer=await self.resolve_peer(chat_id), id=msg_ids))
 
 
 class Userbot:
@@ -146,9 +150,10 @@ class Userbot:
         except ConnectionError:
             pass
 
-        await app.forward_messages(chat_id, from_chat_id, message_ids, disable_notification, schedule_date,
+        msg = await app.forward_messages(chat_id, from_chat_id, message_ids, disable_notification, schedule_date,
                                    protect_content, drop_author)
 
+        return msg.chat.id, msg.id
     async def delete_ad_posts(self, chat_id: int, link: str):
         """
         Deletes all messages from the channel that include a link
@@ -247,6 +252,19 @@ class Userbot:
             msg_ids.append(msg.id)
 
         return msg_ids
+
+    async def delete_scheduled_messages(self, chat_id: int, msg_ids):
+        app = self.app
+        try:
+            await app.start()
+        except ConnectionError:
+            pass
+
+        await app.delete_scheduled_messages(chat_id, msg_ids)
+
+
+
+
 
 
 userbot = Userbot()

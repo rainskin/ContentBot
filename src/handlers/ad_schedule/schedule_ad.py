@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime
 from typing import Iterable
 
@@ -41,16 +42,21 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
     service_msg = await query.message.answer('...Начинаю планирование')
 
+    scheduled_posts = []
     for channel_id in channel_ids:
-        await userbot.forward_messages(channel_id, config.SALE_GROUP_ID, msg_id, schedule_date=schedule_date,
-                                       drop_author=drop_author, disable_notification=notification)
+        scheduled_msg = await userbot.forward_messages(channel_id, config.SALE_GROUP_ID, msg_id, schedule_date=schedule_date,
+                                                       drop_author=drop_author, disable_notification=notification)
+        scheduled_posts.append(scheduled_msg)
+
+    await db.add_ad_post_info(sale_msg_id, title, link, scheduled_posts)
+
     await bot.edit_message_reply_markup(query.message.chat.id, sale_msg_id,
-                                        reply_markup=keyboards.SaleSettings(ad_is_scheduled=True))
-    await db.add_ad_post_info(sale_msg_id, title, link)
-    await delete_messages(query.message.chat.id, msg_id)
-    await bot.edit_message_text(ad_title_text, query.message.chat.id, ad_title_msg_id, parse_mode='html', disable_web_page_preview=True)
-    await bot.delete_message(query.message.chat.id, service_msg.message_id)
+                                        reply_markup=keyboards.SaleSettings(sale_info=await db.sale_info_is_exist(sale_msg_id), ad_is_scheduled=True))
     await state.finish()
+    await delete_messages(query.message.chat.id, service_msg.message_id)
+    await bot.edit_message_text(ad_title_text, query.message.chat.id, ad_title_msg_id, parse_mode='html', disable_web_page_preview=True)
+    await asyncio.sleep(5)
+    await delete_messages(query.message.chat.id, msg_id)
 
 
 @dp.callback_query_handler(text='cancel', state=States.schedule_ad)

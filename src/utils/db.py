@@ -39,19 +39,43 @@ async def add_sale(
     sales.insert_one(sale)
 
 
+async def add_ad_post_info(
+        sale_msg_id: int,
+        title: str,
+        link: List[str],
+        scheduled_posts: List[tuple],
+        is_main_post=True
+):
+    link = link[0] if link else None
+    sales.update_one({'sale_msg_id': sale_msg_id},
+                     {"$set":
+                         {
+                             'title': title,
+                             'link': link,
+                             'is_main_post': is_main_post,
+                             'scheduled_posts': scheduled_posts
+                         }}
+                     )
+
+
 def add_customer_info(sale_msg_id: int, costumer: str, price: int):
     sales.update_one({'sale_msg_id': sale_msg_id}, {"$set": {'costumer': costumer, 'price': price}})
 
 
-async def add_ad_post_info(sale_msg_id: int, title: str, link: List[str], is_main_post=True):
-    link = link[0] if link else None
-    sales.update_one({'sale_msg_id': sale_msg_id},
-                     {"$set": {'title': title, 'link': link, 'is_main_post': is_main_post}})
+async def get_scheduled_posts_info(sale_msg_id: int):
+    sale = sales.find_one({'sale_msg_id': sale_msg_id})
+    return sale['scheduled_posts']
+
+
+async def delete_scheduled_posts_info(sale_msg_id: int):
+    sales.update_one({'sale_msg_id': sale_msg_id}, {"$set": {'scheduled_posts': None}})
+
+
+async def sale_info_is_exist(sale_msg_id: int):
+    return bool(sales.find_one({'sale_msg_id': sale_msg_id})['costumer'])
 
 # s = {
 #     'title': title,
 #     'link': link,
 #     'is_main_post': is_main_post
 # }
-
-

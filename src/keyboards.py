@@ -171,9 +171,17 @@ class SaleSettings(InlineKeyboardMarkup):
     add_sale_info = InlineKeyboardButton('➕ Добавить инф. о продаже', callback_data='add_sale_info')
     update_sale_info = InlineKeyboardButton('♻️ Обновить инф. о продаже', callback_data='update_sale_info')
 
+    delete_scheduled_posts = InlineKeyboardButton('🗑 Удалить посты', callback_data='delete_scheduled_posts')
+
+
+
     def __init__(self, sale_info=None, ad_is_scheduled=False):
         super().__init__()
         sale_info_btn = self.update_sale_info if sale_info else self.add_sale_info
         schedule_ad_btn = self.schedule_additional_ad_post if ad_is_scheduled else self.schedule_ad_post
         self.row_width = 1
-        self.add(sale_info_btn, schedule_ad_btn)
+
+        if ad_is_scheduled:
+            self.add(sale_info_btn, schedule_ad_btn, self.delete_scheduled_posts)
+        else:
+            self.add(sale_info_btn, schedule_ad_btn)

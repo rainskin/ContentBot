@@ -69,6 +69,7 @@ async def _(msg: types.Message, state: FSMContext):
     sale_msg = await msg.answer(text, parse_mode='html', disable_web_page_preview=True, reply_markup=keyboards.SaleSettings())
     await state.update_data(hour=hour, minutes=minutes)
 
+    await state.finish()
     await add_sale(
         salesman[3:-1],
         sale_msg.message_id,
@@ -78,7 +79,6 @@ async def _(msg: types.Message, state: FSMContext):
     )
     await bot.delete_message(msg.chat.id, msg_with_date_id)
     await msg.delete()
-    await state.finish()
 
 
 
