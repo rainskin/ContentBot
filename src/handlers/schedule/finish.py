@@ -9,7 +9,7 @@ import loader
 from loader import dp, bot
 from loader import other_channels, userbot
 from states import States
-from utils.time import create_valid_date, one_day, current_day, current_hour
+from utils.time import create_valid_date, one_day
 
 
 @dp.callback_query_handler(state=States.accept)
@@ -20,10 +20,15 @@ async def finish(callback_query: types.CallbackQuery, state: FSMContext):
     days = data['days']
     time = data['time']
 
-    first_date = create_valid_date(days[0])
+    current_datetime = get_current_datetime()
+    current_day = current_datetime['day']
+    current_month = current_datetime['month']
+    current_year = current_datetime['year']
+
+    first_date = create_valid_date(days[0], current_day, current_month, current_year)
 
     if len(days) == 2:
-        second_date = create_valid_date(days[1]) or first_date
+        second_date = create_valid_date(days[1], current_day, current_month, current_year) or first_date
     else:
         second_date = first_date
 
@@ -68,6 +73,10 @@ async def schedule_posts(date: datetime, time: list, channel_name: str, channel_
     month = date.month
     day = date.day
 
+    current_datetime = get_current_datetime()
+    current_day = current_datetime['day']
+    current_hour = current_datetime['hour']
+
     caption = None
     search_parameter = 'url'  # for tyan and vip tyan
     for hour in time:
@@ -89,7 +98,11 @@ async def schedule_posts(date: datetime, time: list, channel_name: str, channel_
         await asyncio.sleep(0.1)
 
 
+
 def calculate_dropped_posts(date: datetime, time: list[int]):
+    current_datetime = get_current_datetime()
+    current_day = current_datetime['day']
+    current_hour = current_datetime['hour']
     dropped_posts = 0
 
     for hour in time:
@@ -97,3 +110,15 @@ def calculate_dropped_posts(date: datetime, time: list[int]):
             dropped_posts += 1
 
     return dropped_posts
+
+
+def get_current_datetime():
+    c_datetime = datetime.now()
+
+    return {
+        'hour': c_datetime.hour,
+        'day': c_datetime.day,
+        'month': c_datetime.month,
+        'year': c_datetime.year,
+        'time': str(c_datetime.minute) + ':' + str(c_datetime.second)
+    }

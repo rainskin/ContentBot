@@ -11,19 +11,40 @@ from states import States
 
 one_day = timedelta(days=1)
 
-current_hour = datetime.now().hour
 
-current_day = datetime.now().day
-current_year = datetime.now().year
-current_month = datetime.now().month
-
-number_of_days_in_a_month = monthrange(current_year, current_month)[1]
-
-test_date_1 = datetime(year=2024, month=current_month, day=current_day, hour=14)
-test_date_2 = datetime(year=2024, month=current_month, day=current_day, hour=15)
+def get_current_date():
+    return datetime.now().time()
 
 
-def create_valid_date(day: int) -> datetime:
+# current_hour = datetime.now().hour
+
+# ctime = get_current_date()
+# current_day = datetime.now().day
+# current_year = datetime.now().year
+# current_month = datetime.now().month
+
+def get_current_datetime():
+    current_datetime = datetime.now()
+
+    return {
+        'current_hour': current_datetime.hour,
+        'current_day': current_datetime.day,
+        'current_month': current_datetime.month,
+        'current_year': current_datetime.year
+    }
+
+
+def get_number_of_days_in_a_month(current_year: int, current_month: int):
+    return monthrange(current_year, current_month)[1]
+
+
+# number_of_days_in_a_month = get_number_of_days_in_a_month(current_year, current_month)
+
+# test_date_1 = datetime(year=2024, month=current_month, day=current_day, hour=14)
+# test_date_2 = datetime(year=2024, month=current_month, day=current_day, hour=15)
+
+
+def create_valid_date(day: int, current_day: int, current_month: int, current_year: int) -> datetime:
     """This function takes an integer representing a day and returns a valid date. If the provided day is greater
     than or equal to the current day, the function returns a date within the current month. If the day is less than
     the current day, it returns a date in the next month or the next year if the current month is December."""

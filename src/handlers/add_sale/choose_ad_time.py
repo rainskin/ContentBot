@@ -1,13 +1,11 @@
-from typing import List
-
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 import keyboards
-from utils.links import add_links_to_titles
 from loader import dp, bot
 from states import States
 from utils.db import add_sale
+from utils.links import add_links_to_titles
 from utils.time import is_not_correct_time
 
 
