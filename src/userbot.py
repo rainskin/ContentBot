@@ -65,7 +65,7 @@ class Client(pyrogram.Client):
 class Userbot:
 
     def __init__(self):
-        self.app = Client(session_string=config.USERBOT_SESSION_STRING)
+        self.app = Client(session_string=config.CH_SESSION_STRING)
 
     async def copy(self, chat_id, caption, date):
         app = self.app
