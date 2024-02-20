@@ -154,7 +154,7 @@ class Userbot:
                                               protect_content, drop_author)
 
         grouped_messages = {}
-        if type(messages) is 'list':
+        if type(messages) == 'list':
             for msg in messages:
                 chat_id = msg.chat.id
                 if chat_id not in grouped_messages.keys():
