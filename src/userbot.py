@@ -65,7 +65,7 @@ class Client(pyrogram.Client):
 class Userbot:
 
     def __init__(self):
-        self.app = Client(session_string=config.CH_SESSION_STRING)
+        self.app = Client(session_string=config.USERBOT_SESSION_STRING)
 
     async def copy(self, chat_id, caption, date):
         app = self.app
@@ -154,7 +154,8 @@ class Userbot:
                                               protect_content, drop_author)
 
         grouped_messages = {}
-        if type(messages) == 'list':
+        print(f'{type(messages)}')
+        if type(messages) == pyrogram.types.list.List:
             for msg in messages:
                 chat_id = msg.chat.id
                 if chat_id not in grouped_messages.keys():
