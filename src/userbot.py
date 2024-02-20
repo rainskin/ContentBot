@@ -164,6 +164,7 @@ class Userbot:
                 else:
                     grouped_messages[chat_id].append(msg.id)
         else:
+            grouped_messages[messages.chat.id] = []
             grouped_messages[messages.chat.id].append(messages.id)
 
         result = [(chat_id, msgs) for chat_id, msgs in grouped_messages.items()]
