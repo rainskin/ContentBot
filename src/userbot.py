@@ -150,10 +150,25 @@ class Userbot:
         except ConnectionError:
             pass
 
-        msg = await app.forward_messages(chat_id, from_chat_id, message_ids, disable_notification, schedule_date,
-                                   protect_content, drop_author)
+        messages = await app.forward_messages(chat_id, from_chat_id, message_ids, disable_notification, schedule_date,
+                                              protect_content, drop_author)
 
-        return msg.chat.id, msg.id
+        grouped_messages = {}
+        pp = []
+        for msg in messages:
+            chat_id = msg.chat.id
+            if chat_id not in grouped_messages.keys():
+                grouped_messages[chat_id] = []
+                grouped_messages[chat_id].append(msg.id)
+
+            else:
+                grouped_messages[chat_id].append(msg.id)
+
+            pp.append(grouped_messages)
+
+        result = [(chat_id, msgs) for chat_id, msgs in grouped_messages.items()]
+        return result
+
     async def delete_ad_posts(self, chat_id: int, link: str):
         """
         Deletes all messages from the channel that include a link
@@ -261,10 +276,6 @@ class Userbot:
             pass
 
         await app.delete_scheduled_messages(chat_id, msg_ids)
-
-
-
-
 
 
 userbot = Userbot()
