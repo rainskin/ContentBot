@@ -154,7 +154,6 @@ class Userbot:
                                               protect_content, drop_author)
 
         grouped_messages = {}
-        print(f'{type(messages)}')
         if type(messages) == pyrogram.types.list.List:
             for msg in messages:
                 chat_id = msg.chat.id

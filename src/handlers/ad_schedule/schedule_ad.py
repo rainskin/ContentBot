@@ -47,7 +47,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
         scheduled_messages = await userbot.forward_messages(channel_id, config.SALE_GROUP_ID, msg_id, schedule_date=schedule_date,
                                                        drop_author=drop_author, disable_notification=notification)
 
-        scheduled_posts += scheduled_posts + scheduled_messages
+        scheduled_posts += scheduled_messages
 
     await db.add_ad_post_info(sale_msg_id, title, link, scheduled_posts)
 
