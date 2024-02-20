@@ -154,7 +154,7 @@ class Userbot:
                                               protect_content, drop_author)
 
         grouped_messages = {}
-        if len(messages) > 1:
+        if type(messages) is 'list':
             for msg in messages:
                 chat_id = msg.chat.id
                 if chat_id not in grouped_messages.keys():
@@ -165,7 +165,6 @@ class Userbot:
                     grouped_messages[chat_id].append(msg.id)
         else:
             grouped_messages[messages.chat.id].append(messages.id)
-
 
         result = [(chat_id, msgs) for chat_id, msgs in grouped_messages.items()]
         return result
