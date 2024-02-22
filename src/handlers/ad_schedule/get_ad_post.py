@@ -48,6 +48,7 @@ async def _(msg: types.Message, state: FSMContext):
                                         disable_web_page_preview=True)
 
     link = await links.get_links_from_msg(msg)
+
     await state.update_data(drop_author=drop_author, notification=notification, link=link, title=title, ad_title_msg_id=ad_title_msg.message_id,
                             ad_title_text=ad_title_text)
     await bot.delete_message(msg.chat.id, service_msg_id)

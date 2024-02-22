@@ -1,5 +1,5 @@
 import asyncio
-from datetime import datetime
+from datetime import timedelta
 from typing import Iterable
 
 from aiogram import types
@@ -19,48 +19,56 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
     data = await state.get_data()
     is_album = data['is_album']
+    is_main_post = data['is_main_post']
+    link = data['link']  # !!!!
+
     sale_msg_id = data['sale_msg_id']
+    minute = data['minute'] if 'minute' in data else 0
     ad_title_msg_id = data['ad_title_msg_id']
     ad_title_text = str(data['ad_title_text'])
+
     sale_data = sales.find_one({'sale_msg_id': sale_msg_id})
-    date = sale_data['date'].split('-')
-    year = int(date[2])
-    month = int(date[1])
-    day = int(date[0])
-    # day = data['day']
-    time = sale_data['time'].split(':')
-    hour = int(time[0])
-    minutes = int(time[1])
+
     channel_ids = sale_data['channel_ids']
-    link = data['link']
     title = data['title']
+
     msg_ids_in_data = data['message_id']
     drop_author = not data['drop_author']
     notification = not data['notification']
     notification_status_in_text = '🔕 Без звука' if notification else '🔔 Со звуком'
     drop_author_status_in_text = '🚷 Без автора' if drop_author else '👤 Репост'
-    ad_title_text = ad_title_text.replace('принят', f'\n\n✅ <b>Запланирован</b>\n<i>{notification_status_in_text} | {drop_author_status_in_text}</i>')
+
+    schedule_date = await db.get_scheduled_post_datetime(sale_msg_id)
+    schedule_date = schedule_date if is_main_post else schedule_date + timedelta(minutes=minute)
+
+    ad_title_text = ad_title_text.replace('принят',
+                                          f'\n\n✅ <b>Запланирован</b>\n<i>{notification_status_in_text} | {drop_author_status_in_text}</i>')
     msg_id = await userbot.get_msg_ids(query.message.chat.id, msg_ids_in_data[0]) if is_album else msg_ids_in_data
-
-    schedule_date = datetime(year, month, day, hour, minutes)
-
     service_msg = await query.message.answer('...Начинаю планирование')
 
     scheduled_posts = []
     for channel_id in channel_ids:
-        scheduled_messages = await userbot.forward_messages(channel_id, config.SALE_GROUP_ID, msg_id, schedule_date=schedule_date,
-                                                       drop_author=drop_author, disable_notification=notification)
+        scheduled_messages = await userbot.forward_messages(channel_id, config.SALE_GROUP_ID, msg_id,
+                                                            schedule_date=schedule_date,
+                                                            drop_author=drop_author, disable_notification=notification)
 
         scheduled_posts += scheduled_messages
 
-    await db.add_ad_post_info(sale_msg_id, title, link, scheduled_posts)
+    if is_main_post:
+        await db.add_ad_post_info(sale_msg_id, title, link, scheduled_posts)
+        sale_info = await db.sale_info_is_exist(sale_msg_id)
+        await bot.edit_message_reply_markup(query.message.chat.id, sale_msg_id,
+                                            reply_markup=keyboards.SaleSettings(sale_info=sale_info,
+                                                                                ad_is_scheduled=True))
+    else:
+        await db.add_ad_additional_posts(sale_msg_id, scheduled_posts)
+        # service_msg_id = data['service_msg_id']
 
-    await bot.edit_message_reply_markup(query.message.chat.id, sale_msg_id,
-                                        reply_markup=keyboards.SaleSettings(sale_info=await db.sale_info_is_exist(sale_msg_id), ad_is_scheduled=True))
+    await bot.delete_message(query.message.chat.id, service_msg.message_id)
     await state.finish()
-    await delete_messages(query.message.chat.id, service_msg.message_id)
-    await bot.edit_message_text(ad_title_text, query.message.chat.id, ad_title_msg_id, parse_mode='html', disable_web_page_preview=True)
     await delete_messages(query.message.chat.id, msg_id)
+    await bot.edit_message_text(ad_title_text, query.message.chat.id, ad_title_msg_id, parse_mode='html',
+                                disable_web_page_preview=True)
 
 
 @dp.callback_query_handler(text='cancel', state=States.schedule_ad)

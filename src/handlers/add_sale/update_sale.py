@@ -19,6 +19,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     service_msg = await query.message.answer(text, parse_mode='html')
     await state.update_data(sale_msg_id=sale_msg_id, service_msg_id=service_msg.message_id)
     await States.add_sale_info.set()
+    await query.answer()
 
 
 @dp.callback_query_handler(text='update_sale_info', state=None)
@@ -30,6 +31,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     service_msg = await query.message.answer(text, parse_mode='html')
     await state.update_data(sale_msg_id=sale_msg_id, service_msg_id=service_msg.message_id)
     await States.add_sale_info.set()
+    await query.answer()
 
 
 @dp.message_handler(state=States.add_sale_info)
@@ -42,8 +44,8 @@ async def _(msg: types.Message, state: FSMContext):
     try:
         sale_info = msg.text.split(' ')
         customer = sale_info[0]
-        price = sale_info[1]
-        sale_info_text = f'———————————————\n{customer} — <b>{price} руб.</b>'
+        price = int(sale_info[1])
+        sale_info_text = f'———————————————\n{customer} — <b>{str(price)} руб.</b>'
 
     except Exception as e:
         await msg.answer('Что-то пошло не так, попробуй еще раз')
@@ -51,7 +53,7 @@ async def _(msg: types.Message, state: FSMContext):
 
     await db.add_customer_info(sale_msg_id, customer, int(price), sale_info_text)
     new_sale_msg_text = sale_msg_text.replace('placeForAdInfo', f'{sale_info_text}')
-    await bot.edit_message_text(new_sale_msg_text, msg.chat.id, sale_msg_id, parse_mode='html')
+    await bot.edit_message_text(new_sale_msg_text, msg.chat.id, sale_msg_id, parse_mode='html', disable_web_page_preview=True)
     await bot.delete_message(msg.chat.id, service_msg_id)
     await msg.delete()
     await bot.edit_message_reply_markup(msg.chat.id, sale_msg_id, reply_markup=keyboards.SaleSettings(sale_info=True,
