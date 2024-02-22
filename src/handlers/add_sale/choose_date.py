@@ -19,7 +19,8 @@ async def _(msg: types.Message, state: FSMContext):
         await msg.delete()
         return
 
-    number_of_days_in_a_month = get_number_of_days_in_a_month(get_current_datetime()['year'], get_current_datetime()['month'])
+    number_of_days_in_a_month = get_number_of_days_in_a_month(get_current_datetime()['year'],
+                                                              get_current_datetime()['month'])
     if not is_correct_day(day, number_of_days_in_a_month):
         await msg.answer('В текущем месяце нет столько дней')
         await msg.delete()
@@ -37,24 +38,24 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
     current_datetime = get_current_datetime()
     current_day = current_datetime['day']
-    current_time = current_datetime['time']
 
     if text == 'today':
         day = current_day
     elif text == 'tomorrow':
         day = current_day + 1
     else:
-        await query.answer('куда ты звонишь сынок')
+        await query.answer('Кажется, я не могу сделать это сейчас')
         return
 
     msg_text = await get_text_with_valid_date(state, day)
     msg_with_date = await query.message.answer(msg_text, parse_mode='html')
     await query.answer()
-    await query.message.delete()
     await state.update_data(msg_with_date_id=msg_with_date.message_id)
 
+
 async def get_text_with_valid_date(state: FSMContext, day) -> str:
-    date = create_valid_date(day, get_current_datetime()['day'], get_current_datetime()['month'], get_current_datetime()['year'])
+    date = create_valid_date(day, get_current_datetime()['day'], get_current_datetime()['month'],
+                             get_current_datetime()['year'])
     month = date.month
     month_name = RU_MONTHS_GEN[date.month - 1]
     year = date.year
@@ -78,4 +79,3 @@ def get_current_datetime():
         'year': c_datetime.year,
         'time': str(c_datetime.minute) + ':' + str(c_datetime.second)
     }
-

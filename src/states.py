@@ -39,3 +39,6 @@ class States(StatesGroup):
     choose_ad_time = State()
     schedule_ad = State()
 
+    # add/update sale info
+    add_sale_info = State()
+

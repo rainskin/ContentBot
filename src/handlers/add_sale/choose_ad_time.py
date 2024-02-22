@@ -63,15 +63,15 @@ async def _(msg: types.Message, state: FSMContext):
     sale_date = f'📆 #{day}_{month_name}, {str_time}'
     salesman = f'(👤 {msg.from_user.first_name})'
     sale_title = f'<b>Продажа</b>'
-    text = f'{sale_date}\n\n{sale_title} {salesman}\n\n{channels_in_text}'
+    sale_msg_text = f'{sale_date}\n\n{sale_title} {salesman}\n\n{channels_in_text}'
 
-    sale_msg = await msg.answer(text, parse_mode='html', disable_web_page_preview=True, reply_markup=keyboards.SaleSettings())
-    await state.update_data(hour=hour, minutes=minutes)
+    sale_msg = await msg.answer(sale_msg_text, parse_mode='html', disable_web_page_preview=True, reply_markup=keyboards.SaleSettings())
 
     await state.finish()
     await add_sale(
         salesman[3:-1],
         sale_msg.message_id,
+        sale_msg_text,
         [day, month, year],
         str_time,
         channel_ids

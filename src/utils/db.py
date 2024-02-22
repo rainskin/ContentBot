@@ -15,6 +15,7 @@ def get_channels_title_by_id(ids: List[int]):
 async def add_sale(
         salesman: str,
         sale_msg_id: int,
+        sale_msg_text: str,
         date: List[int],
         time: str,
         channel_ids: List[int]
@@ -32,7 +33,11 @@ async def add_sale(
         'channel_ids': channel_ids,
         'title': None,
         'link': None,
-        'is_main_post': None
+        'is_main_post': None,
+        'scheduled_posts': None,
+        'other': {
+            'sale_msg_text': sale_msg_text
+        }
 
     }
 
@@ -44,7 +49,8 @@ async def add_ad_post_info(
         title: str,
         link: List[str],
         scheduled_posts: List[tuple],
-        is_main_post=True
+        is_main_post=True,
+
 ):
     link = link[0] if link else None
     sales.update_one({'sale_msg_id': sale_msg_id},
@@ -58,8 +64,15 @@ async def add_ad_post_info(
                      )
 
 
-def add_customer_info(sale_msg_id: int, costumer: str, price: int):
-    sales.update_one({'sale_msg_id': sale_msg_id}, {"$set": {'costumer': costumer, 'price': price}})
+async def add_customer_info(sale_msg_id: int, costumer: str, price: int, title: str):
+    sale_msg_text = await get_sale_msg_text(sale_msg_id)
+    sales.update_one({'sale_msg_id': sale_msg_id}, {"$set": {'costumer': costumer,
+                                                             'price': price,
+                                                             'other': {
+                                                                 'sale_msg_text': sale_msg_text,
+                                                                 'customer_and_price_title': title}
+                                                             }
+                                                    })
 
 
 async def get_scheduled_posts_info(sale_msg_id: int) -> List[tuple]:
@@ -81,8 +94,16 @@ async def delete_scheduled_posts_info(sale_msg_id: int):
 async def sale_info_is_exist(sale_msg_id: int):
     return bool(sales.find_one({'sale_msg_id': sale_msg_id})['costumer'])
 
+
+async def scheduled_posts_is_exist(sale_msg_id: int):
+    return bool(sales.find_one({'sale_msg_id': sale_msg_id})['scheduled_posts'])
+
+
 # s = {
 #     'title': title,
 #     'link': link,
 #     'is_main_post': is_main_post
 # }
+
+async def get_sale_msg_text(sale_msg_id: int) -> str:
+    return sales.find_one({'sale_msg_id': sale_msg_id})['other']['sale_msg_text']

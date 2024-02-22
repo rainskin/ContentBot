@@ -2,7 +2,7 @@ from datetime import datetime
 
 from aiogram import types
 
-from loader import dp, bot
+from loader import dp, bot, userbot
 from utils.check_admin_rights import is_superadmin
 
 

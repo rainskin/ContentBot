@@ -278,5 +278,15 @@ class Userbot:
 
         await app.delete_scheduled_messages(chat_id, msg_ids)
 
+    async def get_chat_history(self, chat_id: int, limit: int):
+        app = self.app
+        try:
+            await app.start()
+        except ConnectionError:
+            pass
+
+        async for msg in app.get_chat_history(chat_id, limit):
+            print(msg.text)
+
 
 userbot = Userbot()
