@@ -62,13 +62,20 @@ def add_customer_info(sale_msg_id: int, costumer: str, price: int):
     sales.update_one({'sale_msg_id': sale_msg_id}, {"$set": {'costumer': costumer, 'price': price}})
 
 
-async def get_scheduled_posts_info(sale_msg_id: int):
+async def get_scheduled_posts_info(sale_msg_id: int) -> List[tuple]:
     sale = sales.find_one({'sale_msg_id': sale_msg_id})
     return sale['scheduled_posts']
 
 
 async def delete_scheduled_posts_info(sale_msg_id: int):
-    sales.update_one({'sale_msg_id': sale_msg_id}, {"$set": {'scheduled_posts': None}})
+    sales.update_one({'sale_msg_id': sale_msg_id},
+
+                     {"$set": {'scheduled_posts': None,
+                               'title': None,
+                               'link': None,
+                               'is_main_post': None}
+                      }
+                     )
 
 
 async def sale_info_is_exist(sale_msg_id: int):

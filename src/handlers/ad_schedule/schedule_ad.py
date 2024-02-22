@@ -18,6 +18,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     await query.message.edit_reply_markup(None)
 
     data = await state.get_data()
+    is_album = data['is_album']
     sale_msg_id = data['sale_msg_id']
     ad_title_msg_id = data['ad_title_msg_id']
     ad_title_text = str(data['ad_title_text'])
@@ -39,8 +40,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     notification_status_in_text = '🔕 Без звука' if notification else '🔔 Со звуком'
     drop_author_status_in_text = '🚷 Без автора' if drop_author else '👤 Репост'
     ad_title_text = ad_title_text.replace('принят', f'\n\n✅ <b>Запланирован</b>\n<i>{notification_status_in_text} | {drop_author_status_in_text}</i>')
-    msg_id = await userbot.get_msg_ids(query.message.chat.id, msg_ids_in_data[0])
-    print(msg_id)
+    msg_id = await userbot.get_msg_ids(query.message.chat.id, msg_ids_in_data[0]) if is_album else msg_ids_in_data
 
     schedule_date = datetime(year, month, day, hour, minutes)
 

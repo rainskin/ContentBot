@@ -56,6 +56,7 @@ async def _(msg: types.Message, state: FSMContext):
     links = data['channel_links']
     channel_ids = data['channel_ids']
     msg_with_date_id = data['msg_with_date_id']
+    msg_ask_to_select_data_id = data['msg_ask_to_select_data_id']
 
     channels_in_text = "\n".join(add_links_to_titles(channels, links))
 
@@ -76,6 +77,7 @@ async def _(msg: types.Message, state: FSMContext):
         channel_ids
     )
     await bot.delete_message(msg.chat.id, msg_with_date_id)
+    await bot.delete_message(msg.chat.id, msg_ask_to_select_data_id)
     await msg.delete()
 
 

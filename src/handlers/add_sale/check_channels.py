@@ -15,7 +15,8 @@ from states import States
 @dp.callback_query_handler(text='yes', state=States.check_channels)
 async def add_admin(query: types.CallbackQuery, state: FSMContext):
     await query.message.edit_reply_markup(None)
-    await query.message.answer('Отправь дату (только число)', reply_markup=keyboards.AdDate())
+    msg_ask_to_select_data = await query.message.answer('Отправь дату (только число)', reply_markup=keyboards.AdDate())
+    await state.update_data(msg_ask_to_select_data_id=msg_ask_to_select_data.message_id)
     await query.message.delete()
     await States.choose_ad_date.set()
 

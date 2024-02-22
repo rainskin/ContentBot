@@ -14,8 +14,7 @@ async def _(msg: types.Message):
         await msg.answer('Нет доступа')
         return
 
-    # if msg.chat.id != SALE_GROUP_ID:
-    if msg.chat.id != config.UPLOAD_CHANNEL_ID:
+    if msg.chat.id != SALE_GROUP_ID:
         await msg.answer(texts.schedule_start_command, disable_web_page_preview=True)
         return
 

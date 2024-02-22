@@ -29,7 +29,8 @@ async def _(msg: types.Message, state: FSMContext):
         group_id = msg.media_group_id
         await state.update_data(group_id=group_id)
         new_msg_id = msg.message_id
-        await state.update_data(message_id=message_ids + [new_msg_id])
+        await state.update_data(message_id=message_ids + [new_msg_id], is_album=True)
+        await asyncio.sleep(2)
         ad_title_text = f'Пост (альбом) <b>"{title}..."</b> принят'
         ad_title_msg = await msg.answer(ad_title_text,
                                         reply_markup=keyboards.AdPostSettings(drop_author=drop_author,
@@ -38,8 +39,9 @@ async def _(msg: types.Message, state: FSMContext):
 
     else:
 
-        await state.update_data(message_id=msg.message_id)
+        await state.update_data(message_id=msg.message_id, is_album=False)
         ad_title_text = f'Пост <b>"{title}..."</b> принят'
+        await asyncio.sleep(2)
         ad_title_msg = await msg.answer(ad_title_text, parse_mode='html',
                                         reply_markup=keyboards.AdPostSettings(drop_author=drop_author,
                                                                               notification=notification),

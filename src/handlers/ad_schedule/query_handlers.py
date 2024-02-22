@@ -37,9 +37,12 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     sale_msg_id = query.message.message_id
     sale_info = await db.sale_info_is_exist(sale_msg_id)
 
-    for chat_id, msg_ids in await db.get_scheduled_posts_info(sale_msg_id):
+    chats_and_messages = await db.get_scheduled_posts_info(sale_msg_id)
+    count = 0
+    for chat_id, msg_ids in chats_and_messages:
         await userbot.delete_scheduled_messages(chat_id, msg_ids)
+        count += 1
 
-    await query.message.edit_reply_markup(keyboards.SaleSettings(sale_info=sale_info))
-    await db.delete_scheduled_posts_info(query.message.message_id)
-
+    if count == len(chats_and_messages):
+        await query.message.edit_reply_markup(keyboards.SaleSettings(sale_info=sale_info))
+        await db.delete_scheduled_posts_info(query.message.message_id)

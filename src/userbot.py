@@ -59,7 +59,7 @@ class Client(pyrogram.Client):
         return List(forwarded_messages) if is_iterable else forwarded_messages[0]
 
     async def delete_scheduled_messages(self, chat_id: int, msg_ids):
-        r: Any = await self.invoke(DeleteScheduledMessages(peer=await self.resolve_peer(chat_id), id=msg_ids))
+        await self.invoke(DeleteScheduledMessages(peer=await self.resolve_peer(chat_id), id=msg_ids))
 
 
 class Userbot:
