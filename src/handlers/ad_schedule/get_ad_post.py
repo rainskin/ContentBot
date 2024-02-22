@@ -22,17 +22,15 @@ async def _(msg: types.Message, state: FSMContext):
 
     if msg.media_group_id:
         group_id_in_data = data.get('group_id')
-
+        message_ids = data.get('message_id', [])
         if group_id_in_data == msg.media_group_id:
             return
 
         group_id = msg.media_group_id
-
         await state.update_data(group_id=group_id)
-        message_ids = await userbot.get_msg_ids(config.SALE_GROUP_ID, msg.message_id)
-        await state.update_data(message_id=message_ids)
+        new_msg_id = msg.message_id
+        await state.update_data(message_id=message_ids + [new_msg_id])
         ad_title_text = f'Пост (альбом) <b>"{title}..."</b> принят'
-        await asyncio.sleep(3)
         ad_title_msg = await msg.answer(ad_title_text,
                                         reply_markup=keyboards.AdPostSettings(drop_author=drop_author,
                                                                               notification=notification),

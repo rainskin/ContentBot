@@ -142,7 +142,7 @@ class AdPostSettings(InlineKeyboardMarkup):
     sound_on = InlineKeyboardButton('🔔 Со звуком: Да', callback_data='toggle_notification')
     sound_of = InlineKeyboardButton('🔕 Со звуком: Нет', callback_data='toggle_notification')
     enable_author = InlineKeyboardButton('👤 Репост: Да', callback_data='toggle_author')
-    disable_author = InlineKeyboardButton('Репост: Нет', callback_data='toggle_author')
+    disable_author = InlineKeyboardButton('🚷 Репост: Нет', callback_data='toggle_author')
 
     start_schedule = InlineKeyboardButton('✅ Запланировать', callback_data='start_schedule')
     cancel_btn = InlineKeyboardButton('❌ Отменить', callback_data='cancel')

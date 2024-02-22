@@ -19,7 +19,8 @@ async def _(msg: types.Message, state: FSMContext):
         await msg.delete()
         return
 
-    number_of_days_in_a_month = get_number_of_days_in_a_month(get_current_datetime()['day'], get_current_datetime()['month'])
+    number_of_days_in_a_month = get_number_of_days_in_a_month(get_current_datetime()['year'], get_current_datetime()['month'])
+    print(number_of_days_in_a_month)
     if not is_correct_day(day, number_of_days_in_a_month):
         await msg.answer('В текущем месяце нет столько дней')
         await msg.delete()

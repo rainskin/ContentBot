@@ -42,8 +42,10 @@ async def _(msg: types.Message, state: FSMContext):
         channels_in_text = "\n".join(links.add_links_to_titles(channels, channel_links))
         text = f'Выбраны следующие каналы:\n\n{channels_in_text}\n\nВсе верно?'
         await msg.answer(text, parse_mode='html', reply_markup=keyboards.YesOrNo(), disable_web_page_preview=True)
-    else:
+    elif channel_links:
         await msg.answer('Не нашел этих каналов в базе, проверь ссылки')
+        return
+    else:
         return
 
     await States.check_channels.set()

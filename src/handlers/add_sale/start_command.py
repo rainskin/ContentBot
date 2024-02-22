@@ -1,5 +1,6 @@
 from aiogram import types
 
+import config
 import texts
 from config import SALE_GROUP_ID
 from loader import dp
@@ -13,7 +14,8 @@ async def _(msg: types.Message):
         await msg.answer('Нет доступа')
         return
 
-    if msg.chat.id != SALE_GROUP_ID:
+    # if msg.chat.id != SALE_GROUP_ID:
+    if msg.chat.id != config.UPLOAD_CHANNEL_ID:
         await msg.answer(texts.schedule_start_command, disable_web_page_preview=True)
         return
 

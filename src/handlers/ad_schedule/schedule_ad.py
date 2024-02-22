@@ -21,7 +21,6 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     sale_msg_id = data['sale_msg_id']
     ad_title_msg_id = data['ad_title_msg_id']
     ad_title_text = str(data['ad_title_text'])
-    ad_title_text = ad_title_text.replace('принят', '\n\n✅ <b>Запланирован</b>')
     sale_data = sales.find_one({'sale_msg_id': sale_msg_id})
     date = sale_data['date'].split('-')
     year = int(date[2])
@@ -34,9 +33,14 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     channel_ids = sale_data['channel_ids']
     link = data['link']
     title = data['title']
-    msg_id = data['message_id']
+    msg_ids_in_data = data['message_id']
     drop_author = not data['drop_author']
     notification = not data['notification']
+    notification_status_in_text = '🔕 Без звука' if notification else '🔔 Со звуком'
+    drop_author_status_in_text = '🚷 Без автора' if drop_author else '👤 Репост'
+    ad_title_text = ad_title_text.replace('принят', f'\n\n✅ <b>Запланирован</b>\n<i>{notification_status_in_text} | {drop_author_status_in_text}</i>')
+    msg_id = await userbot.get_msg_ids(query.message.chat.id, msg_ids_in_data[0])
+    print(msg_id)
 
     schedule_date = datetime(year, month, day, hour, minutes)
 
@@ -56,7 +60,6 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     await state.finish()
     await delete_messages(query.message.chat.id, service_msg.message_id)
     await bot.edit_message_text(ad_title_text, query.message.chat.id, ad_title_msg_id, parse_mode='html', disable_web_page_preview=True)
-    await asyncio.sleep(3)
     await delete_messages(query.message.chat.id, msg_id)
 
 
