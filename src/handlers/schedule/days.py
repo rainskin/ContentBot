@@ -15,7 +15,7 @@ async def schedule(message: types.Message, state: FSMContext):
     current_day = current_datetime['day']
     current_month = current_datetime['month']
     current_year = current_datetime['year']
-    current_time = current_datetime['time']
+
     try:
         period = message.text.split()
         first_day = int(period[0])
@@ -25,7 +25,10 @@ async def schedule(message: types.Message, state: FSMContext):
         await bot.send_message(message.chat.id, 'Введи две даты через пробел')
         return
 
-    if first_day < current_day:
+    first_date = create_valid_date(first_day, current_day, current_month, current_year)
+    second_date = create_valid_date(last_day, current_day, current_month, current_year)
+
+    if first_date.date() < datetime.now().date():
         await bot.send_message(message.chat.id, 'Нельзя запланировать на прошедшую дату')
         return
 
@@ -36,9 +39,6 @@ async def schedule(message: types.Message, state: FSMContext):
         return
 
     days = [first_day, last_day]
-
-    first_date = create_valid_date(first_day, current_day, current_month, current_year)
-    second_date = create_valid_date(last_day, current_day, current_month, current_year)
 
     first_date_str = str(first_date.day) + ' ' + RU_MONTHS_GEN[first_date.month - 1]
     second_date_str = str(second_date.day) + ' ' + RU_MONTHS_GEN[second_date.month - 1]
@@ -66,3 +66,5 @@ def get_current_datetime():
         'year': c_datetime.year,
         'time': str(c_datetime.minute) + ':' + str(c_datetime.second)
     }
+
+

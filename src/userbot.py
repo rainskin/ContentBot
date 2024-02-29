@@ -67,17 +67,17 @@ class Userbot:
     def __init__(self):
         self.app = Client(session_string=config.USERBOT_SESSION_STRING)
 
-    async def copy(self, chat_id, caption, date):
+    async def copy(self, chat_id, date):
         app = self.app
         try:
             await app.start()
         except ConnectionError:
             pass
 
-        # msg = loader.other_channels.find_one({'channel_id': chat_id})
         random_msg = loader.other_channels.aggregate(
             [{"$match": {"channel_id": chat_id}}, {"$sample": {"size": 1}}]).next()
         msg_id = random_msg['msg_id']
+        caption = get_caption(chat_id)
 
         try:
             # Для альбомов
@@ -92,7 +92,7 @@ class Userbot:
 
         loader.other_channels.delete_one({'msg_id': msg_id})
 
-    async def schedule(self, chat_id, search_parameter, caption, date, anime_tyan: bool):
+    async def schedule(self, chat_id, search_parameter, date, anime_tyan: bool):
 
         # Отложка для канала Аниме Тянки
 
@@ -103,22 +103,22 @@ class Userbot:
         except ConnectionError:
             pass
 
+        caption = get_caption(chat_id)
+
         if anime_tyan:
             random_document = loader.ecchi_col.aggregate([{"$sample": {"size": 1}}]).next()
             photo_link = random_document[search_parameter]
 
             loader.ecchi_col.delete_one({'url': photo_link})
             loader.blacklist.insert_one({'url': photo_link})
-            caption = ''
 
         else:
             random_document = loader.hentai_coll.aggregate([{"$sample": {"size": 1}}]).next()
             photo_link = random_document[search_parameter]
             loader.hentai_coll.delete_one({'url': photo_link})
             loader.blacklist.insert_one({'url': photo_link})
-            caption = ''
 
-        await app.send_photo(chat_id=chat_id, caption=caption, parse_mode=ParseMode.MARKDOWN, photo=photo_link,
+        await app.send_photo(chat_id=chat_id, caption=caption, parse_mode=ParseMode.HTML, photo=photo_link,
                              schedule_date=date)
 
     async def in_chat(self, chat_id):
@@ -290,3 +290,7 @@ class Userbot:
 
 
 userbot = Userbot()
+
+
+def get_caption(chat_id: int):
+    return loader.list_of_channels.find_one({'id': chat_id})['caption']

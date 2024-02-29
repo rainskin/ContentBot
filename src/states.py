@@ -42,6 +42,8 @@ class States(StatesGroup):
     # add/update sale info
     add_sale_info = State()
 
-    #add additional ad post
+    # add additional ad post
     add_additional_ad_post = State()
 
+    # test state
+    test = State()

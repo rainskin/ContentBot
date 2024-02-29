@@ -42,7 +42,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     if text == 'today':
         day = current_day
     elif text == 'tomorrow':
-        day = current_day + 1
+        day = current_day + 1 if current_day < get_number_of_days_in_a_month(current_datetime['year'], current_datetime['month']) else 1
     else:
         await query.answer('Кажется, я не могу сделать это сейчас')
         return

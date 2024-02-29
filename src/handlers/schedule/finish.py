@@ -13,7 +13,7 @@ from utils.time import create_valid_date, one_day
 
 
 @dp.callback_query_handler(state=States.accept)
-async def finish(callback_query: types.CallbackQuery, state: FSMContext):
+async def finish(query: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     channel_name = str(data['channel_name'])
     channel_id = data['channel_id']
@@ -52,18 +52,24 @@ async def finish(callback_query: types.CallbackQuery, state: FSMContext):
     requested_posts_count = amount_of_days * len(time) - calculate_dropped_posts(first_date, time)
 
     if requested_posts_count > total_photos_count:
-        await bot.send_message(callback_query.message.chat.id,
+        await bot.send_message(query.message.chat.id,
                                f'В коллекции *{total_photos_count}* ты запросил {requested_posts_count}\nПополни '
                                f'коллекцию, либо выбери другие даты',
                                parse_mode=types.ParseMode.MARKDOWN)
     else:
-        await bot.send_message(callback_query.message.chat.id, 'Начинаю планирование постов')
+        await bot.send_message(query.message.chat.id, 'Начинаю планирование постов')
 
         while date <= second_date:
-            await schedule_posts(date, time, channel_name, channel_id)
+
+            try:
+                await schedule_posts(date, time, channel_name, channel_id)
+            except Exception as e:
+                await query.message.answer(f'что-то пошло не так\n\n{e}')
+                break
+
             date += one_day
 
-        await bot.send_message(callback_query.message.chat.id, 'Готово')
+        await bot.send_message(query.message.chat.id, 'Готово')
 
     await state.finish()
 
@@ -77,8 +83,8 @@ async def schedule_posts(date: datetime, time: list, channel_name: str, channel_
     current_day = current_datetime['day']
     current_hour = current_datetime['hour']
 
-    caption = None
     search_parameter = 'url'  # for tyan and vip tyan
+
     for hour in time:
 
         if date.day == current_day and current_hour > hour:
@@ -88,15 +94,14 @@ async def schedule_posts(date: datetime, time: list, channel_name: str, channel_
         schedule_date = datetime(year=year, month=month, day=day, hour=hour, minute=minute)
 
         if 'anime tyans' in channel_name.lower():
-            await userbot.schedule(channel_id, search_parameter, caption, schedule_date, anime_tyan=True)
+            await userbot.schedule(channel_id, search_parameter, schedule_date, anime_tyan=True)
 
         elif 'vip tyan' in channel_name.lower():
-            await userbot.schedule(channel_id, search_parameter, caption, schedule_date, anime_tyan=False)
+            await userbot.schedule(channel_id, search_parameter, schedule_date, anime_tyan=False)
 
         else:
-            await userbot.copy(channel_id, caption, schedule_date)
+            await userbot.copy(channel_id, schedule_date)
         await asyncio.sleep(0.1)
-
 
 
 def calculate_dropped_posts(date: datetime, time: list[int]):
