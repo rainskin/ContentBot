@@ -31,7 +31,7 @@ def _parse_pictures(posts: list[dict]) -> list[str]:
     for post in posts:
         media = post['media']
 
-        if 'content' in media:
+        if media and 'content' in media:
             if media['type'] == 'image':
                 picture = media['resolutions'][-1]['url']
                 pictures.add(picture)
