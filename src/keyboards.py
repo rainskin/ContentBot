@@ -158,22 +158,24 @@ class AdPostSettings(InlineKeyboardMarkup):
 class AdDate(InlineKeyboardMarkup):
     today = InlineKeyboardButton('Сегодня', callback_data='today')
     tomorrow = InlineKeyboardButton('Завтра', callback_data='tomorrow')
+    yesterday = InlineKeyboardButton('Вчера', callback_data='yesterday')
 
     def __init__(self):
         super().__init__()
-        self.add(self.today, self.tomorrow)
+        self.row_width = 2
+        self.add(self.today, self.tomorrow, self.yesterday)
 
 
 class SaleSettings(InlineKeyboardMarkup):
     schedule_ad_post = InlineKeyboardButton('🕐 Запланировать пост', callback_data='schedule_ad_post')
-    schedule_additional_ad_post = InlineKeyboardButton('+ Добавить еще пост', callback_data='schedule_additional_ad_post')
+    schedule_additional_ad_post = InlineKeyboardButton('+ Добавить еще пост',
+                                                       callback_data='schedule_additional_ad_post')
 
     add_sale_info = InlineKeyboardButton('➕ Добавить инф. о продаже', callback_data='add_sale_info')
     update_sale_info = InlineKeyboardButton('♻️ Обновить инф. о продаже', callback_data='update_sale_info')
+    delete_sale = InlineKeyboardButton('❌ Удалить продажу', callback_data='delete_sale')
 
     delete_scheduled_posts = InlineKeyboardButton('🗑 Удалить посты', callback_data='delete_scheduled_posts')
-
-
 
     def __init__(self, sale_info=None, ad_is_scheduled=False):
         super().__init__()
@@ -182,6 +184,6 @@ class SaleSettings(InlineKeyboardMarkup):
         self.row_width = 1
 
         if ad_is_scheduled:
-            self.add(sale_info_btn, schedule_ad_btn, self.delete_scheduled_posts)
+            self.add(sale_info_btn, schedule_ad_btn, self.delete_scheduled_posts, self.delete_sale)
         else:
-            self.add(sale_info_btn, schedule_ad_btn)
+            self.add(sale_info_btn, schedule_ad_btn, self.delete_sale)

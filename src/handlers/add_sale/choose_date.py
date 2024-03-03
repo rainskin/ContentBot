@@ -5,7 +5,7 @@ from aiogram.dispatcher import FSMContext
 
 from loader import dp
 from states import States
-from utils.time import create_valid_date, RU_MONTHS_GEN, get_number_of_days_in_a_month
+from utils.time import create_valid_date, RU_MONTHS_GEN, get_number_of_days_in_a_month, one_day
 
 
 @dp.message_handler(state=States.choose_ad_date)
@@ -43,6 +43,8 @@ async def _(query: types.CallbackQuery, state: FSMContext):
         day = current_day
     elif text == 'tomorrow':
         day = current_day + 1 if current_day < get_number_of_days_in_a_month(current_datetime['year'], current_datetime['month']) else 1
+    elif text == 'yesterday':
+        day = current_day - 1
     else:
         await query.answer('Кажется, я не могу сделать это сейчас')
         return
@@ -54,11 +56,20 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
 
 async def get_text_with_valid_date(state: FSMContext, day) -> str:
-    date = create_valid_date(day, get_current_datetime()['day'], get_current_datetime()['month'],
-                             get_current_datetime()['year'])
+
+    current_date = get_current_datetime()
+    current_day = current_date['day']
+    current_month = current_date['month']
+    current_year = current_date['year']
+
+    if day < current_day:
+        date = datetime(current_year, current_month, day)
+    else:
+        date = create_valid_date(day, current_day, current_month, current_year)
+
     month = date.month
-    month_name = RU_MONTHS_GEN[date.month - 1]
     year = date.year
+    month_name = RU_MONTHS_GEN[date.month - 1]
     text = f'Выбрана дата <b>{day} {month_name}</b> \n\n Отправь время в формате: <b>19 05</b>'
     await States.choose_ad_time.set()
     await state.update_data(day=day, month=month, month_name=month_name, year=year)

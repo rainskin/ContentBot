@@ -6,6 +6,7 @@ from config import SALE_GROUP_ID
 from loader import dp, bot
 from states import States
 from utils import db
+from utils.check_admin_rights import is_admin, is_saler
 
 text = 'Отправь имя/юзернейм рекламодателя и цену через пробел\n\n Пример: <b>АДМИН 1000</b>'
 
@@ -16,6 +17,10 @@ async def _(query: types.CallbackQuery, state: FSMContext):
         return
 
     sale_msg_id = query.message.message_id
+    if not is_admin(query.from_user.id) or not is_saler(query.from_user.first_name, sale_msg_id):
+        await query.answer('У тебя нет прав для управления чужими продажами')
+        return
+
     service_msg = await query.message.answer(text, parse_mode='html')
     await state.update_data(sale_msg_id=sale_msg_id, service_msg_id=service_msg.message_id)
     await States.add_sale_info.set()
@@ -28,6 +33,11 @@ async def _(query: types.CallbackQuery, state: FSMContext):
         return
 
     sale_msg_id = query.message.message_id
+
+    if not is_admin(query.from_user.id) or not is_saler(query.from_user.first_name, sale_msg_id):
+        await query.answer('У тебя нет прав для управления чужими продажами')
+        return
+
     service_msg = await query.message.answer(text, parse_mode='html')
     await state.update_data(sale_msg_id=sale_msg_id, service_msg_id=service_msg.message_id)
     await States.add_sale_info.set()
@@ -60,3 +70,21 @@ async def _(msg: types.Message, state: FSMContext):
                                                                                                       ad_is_scheduled=await db.scheduled_posts_is_exist(
                                                                                                           sale_msg_id)))
     await state.finish()
+
+
+@dp.callback_query_handler(text='delete_sale', state=None)
+async def _(query: types.CallbackQuery):
+    if query.message.chat.id != SALE_GROUP_ID:
+        return
+
+    chat_id = query.message.chat.id
+    sale_msg_id = query.message.message_id
+
+    if not is_admin(query.from_user.id) or not is_saler(query.from_user.first_name, sale_msg_id):
+        await query.answer('У тебя нет прав для удаления чужих продаж')
+        return
+
+    await db.delete_sale(sale_msg_id)
+    await query.answer('Продажа удалена')
+    await bot.delete_message(chat_id, sale_msg_id)
+

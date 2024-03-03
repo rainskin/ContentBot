@@ -138,4 +138,5 @@ async def get_scheduled_post_datetime(sale_msg_id: int) -> datetime:
     return datetime(year, month, day, hour, minute)
 
 
-
+async def delete_sale(sale_msg_id: int):
+    sales.delete_one({'sale_msg_id': sale_msg_id})
