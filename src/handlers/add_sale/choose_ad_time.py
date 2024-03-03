@@ -60,7 +60,7 @@ async def _(msg: types.Message, state: FSMContext):
 
     channels_in_text = "\n".join(add_links_to_titles(channels, links))
 
-    sale_date = f'📆 #{day}_{month_name}_{str(year)[0:2]}, {str_time}'
+    sale_date = f'📆 #{day}_{month_name}_{str(year)[2:]}, {str_time}'
     salesman = f'(👤 {msg.from_user.first_name})'
     sale_title = f'<b>Продажа</b>'
     sale_msg_text = f'{sale_date}\n\n{sale_title} {salesman}\n\n{channels_in_text}'
