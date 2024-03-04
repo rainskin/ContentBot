@@ -18,4 +18,5 @@ async def chose_category(query: types.CallbackQuery, state: FSMContext):
                            parse_mode='html')
     await bot.send_message(query.message.chat.id, text=texts.choosing_days,
                            parse_mode=types.ParseMode.MARKDOWN)
+    await query.answer()
     await States.choosing_days.set()

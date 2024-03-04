@@ -14,6 +14,10 @@ from utils.time import create_valid_date, one_day
 
 @dp.callback_query_handler(state=States.accept)
 async def finish(query: types.CallbackQuery, state: FSMContext):
+
+    if query.data != 'accept':
+        return
+
     data = await state.get_data()
     channel_name = str(data['channel_name'])
     channel_id = data['channel_id']
@@ -58,7 +62,7 @@ async def finish(query: types.CallbackQuery, state: FSMContext):
                                parse_mode=types.ParseMode.MARKDOWN)
     else:
         await bot.send_message(query.message.chat.id, 'Начинаю планирование постов')
-
+        await query.answer()
         while date <= second_date:
 
             try:
@@ -68,6 +72,7 @@ async def finish(query: types.CallbackQuery, state: FSMContext):
                 break
 
             date += one_day
+            await asyncio.sleep(2)
 
         await bot.send_message(query.message.chat.id, 'Готово')
 
