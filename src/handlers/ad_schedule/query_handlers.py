@@ -8,7 +8,7 @@ from config import SALE_GROUP_ID
 from loader import dp, userbot, bot
 from states import States
 from utils import db
-from utils.check_admin_rights import is_saler, is_admin
+from utils.check_admin_rights import is_salesman, is_admin
 from utils.time import create_valid_date
 
 
@@ -17,7 +17,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     if query.message.chat.id != SALE_GROUP_ID:
         return
 
-    if not is_admin(query.from_user.id) or not is_saler(query.from_user.first_name, query.message.message_id):
+    if not is_admin(query.from_user.id) or not is_salesman(query.from_user.first_name, query.message.message_id):
         await query.answer('У тебя нет прав для управления чужими продажами')
         return
 
@@ -33,7 +33,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     if query.message.chat.id != SALE_GROUP_ID:
         return
 
-    if not is_admin(query.from_user.id) or not is_saler(query.from_user.first_name, query.message.message_id):
+    if not is_admin(query.from_user.id) or not is_salesman(query.from_user.first_name, query.message.message_id):
         await query.answer('У тебя нет прав для управления чужими продажами')
         return
 
@@ -69,7 +69,7 @@ async def _(query: types.CallbackQuery):
         return
     sale_msg_id = query.message.message_id
 
-    if not is_admin(query.from_user.id) or not is_saler(query.from_user.first_name, sale_msg_id):
+    if not is_salesman(query.from_user.first_name, sale_msg_id) and not is_admin(query.from_user.id):
         await query.answer('У тебя нет прав для управления чужими продажами')
         return
 

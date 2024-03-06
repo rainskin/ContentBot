@@ -6,7 +6,7 @@ from config import SALE_GROUP_ID
 from loader import dp, bot
 from states import States
 from utils import db
-from utils.check_admin_rights import is_admin, is_saler
+from utils.check_admin_rights import is_admin, is_salesman
 
 text = 'Отправь имя/юзернейм рекламодателя и цену через пробел\n\n Пример: <b>АДМИН 1000</b>'
 
@@ -17,7 +17,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
         return
 
     sale_msg_id = query.message.message_id
-    if not is_admin(query.from_user.id) or not is_saler(query.from_user.first_name, sale_msg_id):
+    if not is_salesman(query.from_user.first_name, sale_msg_id) and not is_admin(query.from_user.id):
         await query.answer('У тебя нет прав для управления чужими продажами')
         return
 
@@ -34,7 +34,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
     sale_msg_id = query.message.message_id
 
-    if not is_admin(query.from_user.id) or not is_saler(query.from_user.first_name, sale_msg_id):
+    if not is_salesman(query.from_user.first_name, sale_msg_id) and not is_admin(query.from_user.id):
         await query.answer('У тебя нет прав для управления чужими продажами')
         return
 
@@ -80,7 +80,7 @@ async def _(query: types.CallbackQuery):
     chat_id = query.message.chat.id
     sale_msg_id = query.message.message_id
 
-    if not is_admin(query.from_user.id) or not is_saler(query.from_user.first_name, sale_msg_id):
+    if not is_salesman(query.from_user.first_name, sale_msg_id) and not is_admin(query.from_user.id):
         await query.answer('У тебя нет прав для удаления чужих продаж')
         return
 

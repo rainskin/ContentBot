@@ -11,6 +11,6 @@ def is_superadmin(tg_id: int) -> bool:
         return admin['main admin']
 
 
-def is_saler(name: str, sale_msg_id: int) -> bool:
+def is_salesman(name: str, sale_msg_id: int) -> bool:
     sale = sales.find_one({'sale_msg_id': sale_msg_id})
     return sale['salesman'] == name
