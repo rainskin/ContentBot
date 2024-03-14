@@ -73,6 +73,12 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
 @dp.callback_query_handler(text='cancel', state=States.schedule_ad)
 async def _(query: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    sale_msg_id = data['sale_msg_id']
+
+    sale_info = await db.sale_info_is_exist(sale_msg_id)
+    ad_is_scheduled = await db.scheduled_posts_is_exist(sale_msg_id)
+    await bot.edit_message_reply_markup(query.message.chat.id, sale_msg_id, reply_markup=keyboards.SaleSettings(sale_info, ad_is_scheduled))
     await query.answer('Действие отменено')
     await state.finish()
     await query.message.delete()
