@@ -32,9 +32,10 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 async def _(query: types.CallbackQuery, state: FSMContext):
     if query.message.chat.id != SALE_GROUP_ID:
         return
+    sale_msg_id = query.message.message_id
 
-    if not is_admin(query.from_user.id) or not is_salesman(query.from_user.first_name, query.message.message_id):
-        await query.answer('У тебя нет прав для управления чужими продажами')
+    if not is_salesman(query.from_user.first_name, sale_msg_id) and not is_admin(query.from_user.id):
+        await query.answer('У тебя нет прав для удаления чужих продаж')
         return
 
     service_msg = await query.message.answer('Через сколько минут запланировать следующий пост?')
