@@ -78,10 +78,7 @@ class Userbot:
             [{"$match": {"channel_id": chat_id}}, {"$sample": {"size": 1}}]).next()
         msg_id = random_msg['msg_id']
         msg = await app.get_messages(config.UPLOAD_CHANNEL_ID, msg_id)
-        print(msg)
         caption = get_caption(chat_id)
-        print(caption)
-        print(msg_id)
         msg_caption = msg.caption if msg.caption else ''
         caption = msg_caption + caption
 
