@@ -64,7 +64,6 @@ async def finish(query: types.CallbackQuery, state: FSMContext):
         await bot.send_message(query.message.chat.id, 'Начинаю планирование постов')
         await query.answer()
         while date <= second_date:
-
             try:
                 await schedule_posts(date, time, channel_name, channel_id)
             except Exception as e:
@@ -103,6 +102,7 @@ async def schedule_posts(date: datetime, time: list, channel_name: str, channel_
 
         elif 'vip tyan' in channel_name.lower():
             await userbot.schedule(channel_id, search_parameter, schedule_date, anime_tyan=False)
+
 
         else:
             await userbot.copy(channel_id, schedule_date)

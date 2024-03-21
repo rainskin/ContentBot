@@ -77,20 +77,25 @@ class Userbot:
         random_msg = loader.other_channels.aggregate(
             [{"$match": {"channel_id": chat_id}}, {"$sample": {"size": 1}}]).next()
         msg_id = random_msg['msg_id']
+        msg = await app.get_messages(config.UPLOAD_CHANNEL_ID, msg_id)
+        print(msg)
         caption = get_caption(chat_id)
+        print(caption)
+        print(msg_id)
+        msg_caption = msg.caption if msg.caption else ''
+        caption = msg_caption + caption
+
 
         try:
             # Для альбомов
-            await app.copy_media_group(chat_id=chat_id, from_chat_id=config.UPLOAD_CHANNEL_ID, message_id=msg_id,
-                                       captions=caption,
-                                       schedule_date=date)
+            await app.copy_media_group(chat_id=chat_id, from_chat_id=config.UPLOAD_CHANNEL_ID, message_id=msg_id, captions=caption,schedule_date=date)
         except ValueError:
             # Для соло пикч
             await app.copy_message(chat_id=chat_id, from_chat_id=config.UPLOAD_CHANNEL_ID, message_id=msg_id,
                                    caption=caption,
                                    schedule_date=date)
 
-        loader.other_channels.delete_one({'msg_id': msg_id})
+        # loader.other_channels.delete_one({'msg_id': msg_id})
 
     async def schedule(self, chat_id, search_parameter, date, anime_tyan: bool):
 
