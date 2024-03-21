@@ -92,7 +92,7 @@ class Userbot:
                                    caption=caption,
                                    schedule_date=date)
 
-        # loader.other_channels.delete_one({'msg_id': msg_id})
+        loader.other_channels.delete_one({'msg_id': msg_id})
 
     async def schedule(self, chat_id, search_parameter, date, anime_tyan: bool):
 
