@@ -1,5 +1,5 @@
 from datetime import datetime
-from utils.time import get_number_of_days_in_a_month, create_valid_date, RU_MONTHS_GEN
+from utils.time import get_number_of_days_in_a_month, create_valid_date, RU_MONTHS_GEN, get_current_datetime
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
@@ -56,15 +56,15 @@ async def schedule(message: types.Message, state: FSMContext):
     await States.choosing_time.set()
 
 
-def get_current_datetime():
-    c_datetime = datetime.now()
-
-    return {
-        'hour': c_datetime.hour,
-        'day': c_datetime.day,
-        'month': c_datetime.month,
-        'year': c_datetime.year,
-        'time': str(c_datetime.minute) + ':' + str(c_datetime.second)
-    }
+# def get_current_datetime():
+#     c_datetime = datetime.now()
+#
+#     return {
+#         'hour': c_datetime.hour,
+#         'day': c_datetime.day,
+#         'month': c_datetime.month,
+#         'year': c_datetime.year,
+#         'time': str(c_datetime.minute) + ':' + str(c_datetime.second)
+#     }
 
 

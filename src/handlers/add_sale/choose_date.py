@@ -5,7 +5,7 @@ from aiogram.dispatcher import FSMContext
 
 from loader import dp
 from states import States
-from utils.time import create_valid_date, RU_MONTHS_GEN, get_number_of_days_in_a_month, one_day
+from utils.time import create_valid_date, RU_MONTHS_GEN, get_number_of_days_in_a_month, one_day, get_current_datetime
 
 
 @dp.message_handler(state=States.choose_ad_date)
@@ -80,13 +80,13 @@ def is_correct_day(day: int, number_of_days_in_a_month: int) -> bool:
     return 0 < day <= number_of_days_in_a_month
 
 
-def get_current_datetime():
-    c_datetime = datetime.now()
-
-    return {
-        'hour': c_datetime.hour,
-        'day': c_datetime.day,
-        'month': c_datetime.month,
-        'year': c_datetime.year,
-        'time': str(c_datetime.minute) + ':' + str(c_datetime.second)
-    }
+# def get_current_datetime():
+#     c_datetime = datetime.now()
+#
+#     return {
+#         'hour': c_datetime.hour,
+#         'day': c_datetime.day,
+#         'month': c_datetime.month,
+#         'year': c_datetime.year,
+#         'time': str(c_datetime.minute) + ':' + str(c_datetime.second)
+#     }

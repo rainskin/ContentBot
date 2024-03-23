@@ -9,7 +9,7 @@ import loader
 from loader import dp, bot
 from loader import other_channels, userbot
 from states import States
-from utils.time import create_valid_date, one_day
+from utils.time import create_valid_date, one_day, get_current_datetime
 
 
 @dp.callback_query_handler(state=States.accept)
@@ -122,13 +122,13 @@ def calculate_dropped_posts(date: datetime, time: list[int]):
     return dropped_posts
 
 
-def get_current_datetime():
-    c_datetime = datetime.now()
-
-    return {
-        'hour': c_datetime.hour,
-        'day': c_datetime.day,
-        'month': c_datetime.month,
-        'year': c_datetime.year,
-        'time': str(c_datetime.minute) + ':' + str(c_datetime.second)
-    }
+# def get_current_datetime():
+#     c_datetime = datetime.now()
+#
+#     return {
+#         'hour': c_datetime.hour,
+#         'day': c_datetime.day,
+#         'month': c_datetime.month,
+#         'year': c_datetime.year,
+#         'time': str(c_datetime.minute) + ':' + str(c_datetime.second)
+#     }

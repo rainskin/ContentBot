@@ -24,13 +24,14 @@ def get_current_date():
 # current_month = datetime.now().month
 
 def get_current_datetime():
-    current_datetime = datetime.now()
+    c_datetime = datetime.now()
 
     return {
-        'current_hour': current_datetime.hour,
-        'current_day': current_datetime.day,
-        'current_month': current_datetime.month,
-        'current_year': current_datetime.year
+        'hour': c_datetime.hour,
+        'day': c_datetime.day,
+        'month': c_datetime.month,
+        'year': c_datetime.year,
+        'time': str(c_datetime.minute) + ':' + str(c_datetime.second)
     }
 
 
