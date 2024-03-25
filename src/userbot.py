@@ -79,9 +79,10 @@ class Userbot:
         msg_id = random_msg['msg_id']
         msg = await app.get_messages(config.UPLOAD_CHANNEL_ID, msg_id)
         caption = get_caption(chat_id)
-        msg_caption = msg.caption if msg.caption else ''
-        caption = msg_caption + caption
 
+        if caption:
+            msg_caption = msg.caption if msg.caption else ''
+            caption = msg_caption + caption
 
         try:
             # Для альбомов
