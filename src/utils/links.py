@@ -29,8 +29,11 @@ async def get_links_from_msg(msg: types.Message):
     return links
 
 
-def add_links_to_titles(channels: List[str], links: List[str]):
+def add_links_to_titles(titles: List[str], links: List[str]) -> List[str]:
     channels_with_links = []
-    for i in range(len(channels)):
-        channels_with_links.append(f'{i + 1}. <b><a href="{links[i]}">{channels[i]}</a></b>')
+    for i in range(len(titles)):
+        channels_with_links.append(f'{i + 1}. <b><a href="{links[i]}">{titles[i]}</a></b>')
     return channels_with_links
+
+
+

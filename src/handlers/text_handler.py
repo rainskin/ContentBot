@@ -1,0 +1,72 @@
+from typing import List
+
+
+from aiogram import types
+from aiogram.dispatcher import FSMContext
+
+import keyboards
+import texts
+from config import SALE_GROUP_ID
+from loader import dp, bot, list_of_channels
+from states import States
+from utils import links
+from utils.check_admin_rights import is_admin
+from utils.db import get_ids_of_all_channels
+from utils.time import get_current_datetime
+
+
+@dp.message_handler(content_types='any')
+async def _(msg: types.Message, state: FSMContext):
+
+    if msg.chat.id in get_ids_of_all_channels():
+        current_datatime = get_current_datetime()
+        msg_id = msg.chat.id
+        if not await is_ad_post(msg_id):
+            return
+
+        pass
+
+
+
+
+    elif msg.chat.id == SALE_GROUP_ID:
+
+        entities = msg.entities or msg.caption_entities
+
+        if not entities:
+            return
+
+        channel_links = await links.get_links_from_msg(msg)
+
+        channels = []
+        channel_ids = []
+
+        for link in channel_links:
+            channel = list_of_channels.find_one({'link': link})
+            if not channel:
+                continue
+
+            title = channel['title']
+            _id = channel['id']
+            channel_ids.append(_id)
+            channels.append(title)
+
+        if channels:
+            channels_in_text = "\n".join(links.add_links_to_titles(channels, channel_links))
+            text = f'Выбраны следующие каналы:\n\n{channels_in_text}\n\nВсе верно?'
+            await msg.answer(text, parse_mode='html', reply_markup=keyboards.YesOrNo(), disable_web_page_preview=True)
+        elif channel_links:
+            await msg.answer('Не нашел этих каналов в базе, проверь ссылки')
+            return
+        else:
+            return
+
+        await States.check_channels.set()
+        await msg.delete()
+        await state.update_data(channels=channels, channel_ids=channel_ids, channel_links=channel_links)
+
+    else:
+        return
+
+def is_ad_post(msg_id):
+    pass

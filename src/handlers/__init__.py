@@ -11,4 +11,4 @@ def setup():
     from . import ad_schedule
     from . import ad_posts_handler
 
-    from . import text
+    from . import text_handler

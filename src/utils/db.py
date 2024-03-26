@@ -1,15 +1,19 @@
 from datetime import datetime as dt, datetime
 from typing import List
 
-from loader import list_of_channels, sales
+from loader import list_of_channels, sales, other_channels, ecchi_col, hentai_coll
 
 
-def get_ids_of_all_channels():
+def get_ids_of_all_channels() -> List[int]:
     return list_of_channels.distinct('id')
 
 
 def get_channels_title_by_id(ids: List[int]):
     return [list_of_channels.find_one({'id': _id})['title'] for _id in ids]
+
+
+async def get_channel_link_by_title(title: str):
+    return list_of_channels.find_one({'title': title})['link']
 
 
 async def add_sale(
@@ -140,3 +144,25 @@ async def get_scheduled_post_datetime(sale_msg_id: int) -> datetime:
 
 async def delete_sale(sale_msg_id: int):
     sales.delete_one({'sale_msg_id': sale_msg_id})
+
+
+async def count_content_posts_by_channel() -> List[tuple]:
+    channel_ids = get_ids_of_all_channels()
+    channel_title_and_amount = []
+
+    for channel_id in channel_ids:
+
+        channel_title = list_of_channels.find_one({'id': channel_id})['title']
+
+        if 'anime tyans' in channel_title.lower():
+            number_of_posts = ecchi_col.count_documents({})
+
+        elif 'vip tyan' in channel_title.lower():
+            number_of_posts = hentai_coll.count_documents({})
+
+        else:
+            number_of_posts = other_channels.count_documents({'channel_id': channel_id})
+
+        channel_title_and_amount.append((channel_title, number_of_posts))
+
+    return channel_title_and_amount

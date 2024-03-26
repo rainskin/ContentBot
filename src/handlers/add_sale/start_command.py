@@ -19,5 +19,4 @@ async def _(msg: types.Message):
         return
 
     await States.get_channels_for_ad.set()
-    await msg.answer(
-        f'Отправь список каналов, в которые хочешь запланировать пост')
+    await msg.answer(f'Добавим продажу? Отправь сюда список каналов')
