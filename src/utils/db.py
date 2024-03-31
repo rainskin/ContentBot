@@ -166,3 +166,7 @@ async def count_content_posts_by_channel() -> List[tuple]:
         channel_title_and_amount.append((channel_title, number_of_posts))
 
     return channel_title_and_amount
+
+
+def get_delete_time():
+    pass

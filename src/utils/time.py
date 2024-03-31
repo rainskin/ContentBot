@@ -31,6 +31,7 @@ def get_current_datetime():
         'day': c_datetime.day,
         'month': c_datetime.month,
         'year': c_datetime.year,
+        'minute': c_datetime.minute,
         'time': str(c_datetime.minute) + ':' + str(c_datetime.second)
     }
 

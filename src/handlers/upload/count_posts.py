@@ -22,7 +22,7 @@ async def cmd_count(msg: types.Message):
 
     channels_for_text = "\n".join(channels_and_amount)
     text = f'<b>Текущее количество постов в БД:</b>\n\n{channels_for_text}\n\nНажми /upload, чтобы начать загрузку контента'
-    await msg.answer(text, parse_mode='html')
+    await msg.answer(text, parse_mode='html', disable_web_page_preview=True)
     await start_message.delete()
 
 

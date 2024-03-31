@@ -38,7 +38,6 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
     current_datetime = get_current_datetime()
     current_day = current_datetime['day']
-
     if text == 'today':
         day = current_day
     elif text == 'tomorrow':
@@ -59,13 +58,10 @@ async def get_text_with_valid_date(state: FSMContext, day) -> str:
 
     current_date = get_current_datetime()
     current_day = current_date['day']
-    current_month = current_date['month']
     current_year = current_date['year']
+    current_month = current_date['month']
 
-    if day < current_day:
-        date = datetime(current_year, current_month, day)
-    else:
-        date = create_valid_date(day, current_day, current_month, current_year)
+    date = create_valid_date(day, current_day, current_month, current_year)
 
     month = date.month
     year = date.year
