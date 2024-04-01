@@ -1,13 +1,5 @@
-import calendar
-from datetime import datetime, timedelta
 from calendar import monthrange
-
-from aiogram import types
-from aiogram.dispatcher import FSMContext
-
-import keyboards
-from loader import dp, bot
-from states import States
+from datetime import datetime, timedelta
 
 one_day = timedelta(days=1)
 
@@ -15,13 +7,6 @@ one_day = timedelta(days=1)
 def get_current_date():
     return datetime.now().time()
 
-
-# current_hour = datetime.now().hour
-
-# ctime = get_current_date()
-# current_day = datetime.now().day
-# current_year = datetime.now().year
-# current_month = datetime.now().month
 
 def get_current_datetime():
     c_datetime = datetime.now()
@@ -38,12 +23,6 @@ def get_current_datetime():
 
 def get_number_of_days_in_a_month(current_year: int, current_month: int):
     return monthrange(current_year, current_month)[1]
-
-
-# number_of_days_in_a_month = get_number_of_days_in_a_month(current_year, current_month)
-
-# test_date_1 = datetime(year=2024, month=current_month, day=current_day, hour=14)
-# test_date_2 = datetime(year=2024, month=current_month, day=current_day, hour=15)
 
 
 def create_valid_date(day: int, current_day: int, current_month: int, current_year: int) -> datetime:
@@ -80,7 +59,7 @@ RU_MONTHS_GEN = ["Января", "Февраля", "Марта", "Апреля",
                  "Ноября", "Декабря"]
 
 
-class RUMonths():
+class RUMonths:
     months = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября",
               "Декабря"]
 
