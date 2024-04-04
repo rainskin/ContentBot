@@ -17,6 +17,7 @@ async def add_channel(query: types.CallbackQuery, state: FSMContext):
         'title': channel_title,
         'link': link,
         'id': channel_id,
+        'caption': None
     }
 
     list_of_channels.insert_one(channel)
