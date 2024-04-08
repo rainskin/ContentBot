@@ -27,9 +27,9 @@ async def cmd_count(msg: types.Message):
 
 
 def get_marker(amount: int) -> str:
-    if 0 < amount < 15:
+    if 0 < amount <= 15:
         marker = '🔴'
-    elif 15 < amount < 30:
+    elif 15 < amount <= 30:
         marker = '🟡'
     elif amount > 30:
         marker = '🟢'

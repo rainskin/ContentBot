@@ -10,10 +10,7 @@ from config import SALE_GROUP_ID
 from loader import dp, bot, list_of_channels
 from states import States
 from utils import links
-from utils.check_admin_rights import is_admin
 
-from utils.db import get_ids_of_all_channels, get_delete_time
-from utils.time import get_current_datetime
 
 
 @dp.message_handler(content_types='any')

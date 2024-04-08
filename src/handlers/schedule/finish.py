@@ -14,7 +14,6 @@ from utils.time import create_valid_date, one_day, get_current_datetime
 
 @dp.callback_query_handler(state=States.accept)
 async def finish(query: types.CallbackQuery, state: FSMContext):
-
     if query.data != 'accept':
         return
 
@@ -103,7 +102,6 @@ async def schedule_posts(date: datetime, time: list, channel_name: str, channel_
         elif 'vip tyan' in channel_name.lower():
             await userbot.schedule(channel_id, search_parameter, schedule_date, anime_tyan=False)
 
-
         else:
             await userbot.copy(channel_id, schedule_date)
         await asyncio.sleep(0.1)
@@ -120,7 +118,6 @@ def calculate_dropped_posts(date: datetime, time: list[int]):
             dropped_posts += 1
 
     return dropped_posts
-
 
 # def get_current_datetime():
 #     c_datetime = datetime.now()
