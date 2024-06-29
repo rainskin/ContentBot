@@ -54,9 +54,11 @@ async def _(msg: types.Message, state: FSMContext):
             await state.update_data(group_id=group_id)
             new_message_id = msg.message_id
             await state.update_data(message_ids=message_ids + [new_message_id])
+            await msg.reply('Добавил')
 
     else:
 
         new_message_id = msg.message_id
         message_ids = data.get('message_ids', [])
         await state.update_data(message_ids=message_ids + [new_message_id])
+        await msg.reply('Добавил')
