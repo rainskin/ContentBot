@@ -88,7 +88,7 @@ async def schedule_posts(date: datetime, time: list, channel_name: str, channel_
     current_hour = current_datetime['hour']
 
     search_parameter = 'url'  # for tyan and vip tyan
-
+    print('перед началом копирования')
     for hour in time:
 
         if date.day == current_day and current_hour > hour:
@@ -96,7 +96,7 @@ async def schedule_posts(date: datetime, time: list, channel_name: str, channel_
 
         minute = randint(0, 8)
         schedule_date = datetime(year=year, month=month, day=day, hour=hour, minute=minute)
-
+        print('определили дату')
         if 'anime tyans' in channel_name.lower():
             await userbot.schedule(channel_id, search_parameter, schedule_date, anime_tyan=True)
 
