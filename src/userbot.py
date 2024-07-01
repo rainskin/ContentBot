@@ -68,10 +68,11 @@ class Userbot:
         self.app = Client(session_string=config.USERBOT_SESSION_STRING)
 
     async def copy(self, chat_id, date):
+        print('Начало функции копирования')
         app = self.app
         try:
             await app.start()
-            print('начинаем копировать')
+            print('Типа запустили юзербота')
         except ConnectionError:
             pass
 
