@@ -67,7 +67,7 @@ async def finish(query: types.CallbackQuery, state: FSMContext):
                 await schedule_posts(date, time, channel_name, channel_id)
             except Exception as e:
                 await query.message.answer(f'что-то пошло не так\n\n{e}')
-                break
+                continue
 
             date += one_day
             await asyncio.sleep(2)
