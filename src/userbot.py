@@ -78,15 +78,14 @@ class Userbot:
         random_msg = loader.other_channels.aggregate(
             [{"$match": {"channel_id": chat_id}}, {"$sample": {"size": 1}}]).next()
         msg_id = random_msg['msg_id']
-        print(msg_id)
         msg = await app.get_messages(config.UPLOAD_CHANNEL_ID, msg_id)
         caption = get_caption(chat_id)
-        print(caption)
         if caption:
             msg_caption = msg.caption if msg.caption else ''
             caption = msg_caption + caption
 
-        print(f'Копирую из {config.UPLOAD_CHANNEL_ID} в {chat_id}')
+
+        chat = await app.get_chat(-1001738529532)
         try:
             # Для альбомов
 
