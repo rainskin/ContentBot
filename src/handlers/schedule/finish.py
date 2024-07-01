@@ -76,6 +76,7 @@ async def finish(query: types.CallbackQuery, state: FSMContext):
 
 
 async def schedule_posts(date: datetime, time: list, channel_name: str, channel_id: int):
+    print('планирую пост')
     year = date.year
     month = date.month
     day = date.day
