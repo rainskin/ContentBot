@@ -71,6 +71,7 @@ class Userbot:
         app = self.app
         try:
             await app.start()
+            print('начинаем копировать')
         except ConnectionError:
             pass
 
@@ -80,18 +81,27 @@ class Userbot:
         msg = await app.get_messages(config.UPLOAD_CHANNEL_ID, msg_id)
         caption = get_caption(chat_id)
 
+        print(f'пост получен id {msg_id}, msg {msg}')
+
         if caption:
             msg_caption = msg.caption if msg.caption else ''
             caption = msg_caption + caption
 
         try:
             # Для альбомов
-            await app.copy_media_group(chat_id=chat_id, from_chat_id=config.UPLOAD_CHANNEL_ID, message_id=msg_id, captions=caption,schedule_date=date)
+            try:
+                await app.copy_media_group(chat_id=chat_id, from_chat_id=config.UPLOAD_CHANNEL_ID, message_id=msg_id,
+                                           captions=caption, schedule_date=date)
+            except Exception as e:
+                print(e)
         except ValueError:
             # Для соло пикч
-            await app.copy_message(chat_id=chat_id, from_chat_id=config.UPLOAD_CHANNEL_ID, message_id=msg_id,
+            try:
+                await app.copy_message(chat_id=chat_id, from_chat_id=config.UPLOAD_CHANNEL_ID, message_id=msg_id,
                                    caption=caption,
                                    schedule_date=date)
+            except Exception as e:
+                print(e)
 
         loader.other_channels.delete_one({'msg_id': msg_id})
 
