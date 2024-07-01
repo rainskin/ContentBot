@@ -63,9 +63,12 @@ async def finish(query: types.CallbackQuery, state: FSMContext):
         await bot.send_message(query.message.chat.id, 'Начинаю планирование постов')
         await query.answer()
         while date <= second_date:
-
-            await schedule_posts(date, time, channel_name, channel_id)
-
+            try:
+                await schedule_posts(date, time, channel_name, channel_id)
+            except Exception as e:
+                print(e)
+                await query.message.answer(f'что-то пошло не так\n\n{e}')
+                break
 
             date += one_day
             await asyncio.sleep(2)
@@ -76,7 +79,6 @@ async def finish(query: types.CallbackQuery, state: FSMContext):
 
 
 async def schedule_posts(date: datetime, time: list, channel_name: str, channel_id: int):
-    print('планирую пост')
     year = date.year
     month = date.month
     day = date.day
