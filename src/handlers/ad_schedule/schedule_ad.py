@@ -46,7 +46,11 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     notification_status_in_text = '🔕 Без звука' if notification else '🔔 Со звуком'
     drop_author_status_in_text = '🚷 Без автора' if drop_author else '👤 Репост'
 
-    hours, minutes = autodelete_timer.split(':') if autodelete_timer else 0, 0
+    hours, minutes = autodelete_timer.split(':') if autodelete_timer else (0, 0)
+
+    print(autodelete_timer)
+    print(hours)
+    print(minutes)
     autodelete_timer_in_text = f'<i>🗑 Удалить через</i>: {hours} ч {minutes} мин' if autodelete_timer else '<i>🗑 Без удаления</i>'
 
     schedule_date = await db.get_scheduled_post_datetime(sale_msg_id)
@@ -121,12 +125,7 @@ async def send_report_about_scheduled_posts(chat_id: int, schedule_date: datetim
 
 def get_report_text_about_scheduled_posts(schedule_date: datetime.datetime, data: dict) -> str:
     title = data.get('title')
-    drop_author = not data['drop_author']
-    notification = not data['notification']
     channel_ids = data.get('channel_ids')
-
-    notification_status_in_text = '🔕 Без звука' if notification else '🔔 Со звуком'
-    drop_author_status_in_text = '🚷 Без автора' if drop_author else '👤 Репост'
 
     channel_names = db.get_channels_title_by_id(channel_ids)
     channel_links = [db.get_channel_link_by_title(title) for title in channel_names]
@@ -136,8 +135,7 @@ def get_report_text_about_scheduled_posts(schedule_date: datetime.datetime, data
     header = f'📋 Пост <b>«{title}»</b>'
     schedule_day = schedule_date.day
     schedule_time = schedule_date.time()
-    date = f'{schedule_day} {RU_MONTHS_GEN[schedule_day]} {schedule_time.hour}:{schedule_time.minute}'
-    post_settings = f'<i>{notification_status_in_text} | {drop_author_status_in_text}</i>\n'
+    date = f'{schedule_day} {RU_MONTHS_GEN[schedule_day]} {schedule_time.hour}:{schedule_time.minute:02d}'
     text = (f'{header}\n'
             f'Будет опубликован <b>{date}</b> в следующих каналах:\n\n'
             f'{channel_list}')
