@@ -14,7 +14,6 @@ async def cmd_schedule(msg: types.Message):
         return
     else:
         # await count_posts_in_channels()
-
         await msg.answer(text=texts.schedule_main, reply_markup=keyboards.Channels())
         await States.schedule.set()
 

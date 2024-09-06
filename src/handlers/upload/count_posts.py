@@ -16,7 +16,7 @@ async def cmd_count(msg: types.Message):
     for i in sorted(channels_and_amount_posts, key=lambda item: item[1], reverse=True):
         title, amount = i[0], i[1]
         marker = get_marker(amount)
-        link = await get_channel_link_by_title(title)
+        link = get_channel_link_by_title(title)
 
         channels_and_amount.append(f'{marker} <b><a href="{link}">{title}</a></b>  — {str(amount)}')
 

@@ -28,6 +28,7 @@ async def add_channel(query: types.CallbackQuery, state: FSMContext):
     await state.set_state(None)
 
 
+
 @dp.callback_query_handler(text='no', state=States.add_channel)
 async def add_channel(query: types.CallbackQuery, state: FSMContext):
     await query.answer('Действие отменено', show_alert=False)

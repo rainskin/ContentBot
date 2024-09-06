@@ -74,7 +74,6 @@ class Userbot:
         except ConnectionError:
             pass
 
-        print('Начал копировать')
         random_msg = loader.other_channels.aggregate(
             [{"$match": {"channel_id": chat_id}}, {"$sample": {"size": 1}}]).next()
         msg_id = random_msg['msg_id']

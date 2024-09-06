@@ -20,6 +20,7 @@ async def _(msg: types.Message, state: FSMContext):
 
 
 async def show_admins(msg: types.Message):
+
     admin_ids = (list_of_admins.distinct('id'))
     msg_ids = []
     for _id in admin_ids:

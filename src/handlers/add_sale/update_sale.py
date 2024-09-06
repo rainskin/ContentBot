@@ -67,7 +67,7 @@ async def _(msg: types.Message, state: FSMContext):
     await bot.delete_message(msg.chat.id, service_msg_id)
     await msg.delete()
     await bot.edit_message_reply_markup(msg.chat.id, sale_msg_id, reply_markup=keyboards.SaleSettings(sale_info=True,
-                                                                                                      ad_is_scheduled=await db.scheduled_posts_is_exist(
+                                                                                                      ad_is_scheduled=await db.is_scheduled_posts_exist(
                                                                                                           sale_msg_id)))
     await state.finish()
 

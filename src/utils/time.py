@@ -1,6 +1,8 @@
 from calendar import monthrange
 from datetime import datetime, timedelta
 
+from aiogram import types
+
 one_day = timedelta(days=1)
 
 
@@ -71,3 +73,54 @@ class RUMonths:
 
 def is_not_correct_time(hours: int, minutes: int):
     return hours < 0 or hours > 23 or minutes < 0 or minutes > 59
+
+
+def get_time_from_msg_text(msg: types.Message):
+    time = msg.text
+
+    if ':' in time:
+        try:
+            hour, minutes = time.split(':')
+
+        except ValueError:
+            raise ValueError('Используй только цифры')
+            # await msg.delete()
+            # return
+
+    elif len(time) <= 3:
+        try:
+            hour = int(time)
+            minutes = 0
+        except ValueError:
+            raise ValueError('Используй только цифры')
+
+    elif 4 <= len(time) <= 5:
+        try:
+            hour = int(time[:2])
+            minutes = int(time[-2:])
+
+        except ValueError:
+            raise ValueError('Используй только цифры')
+            # await msg.delete()
+            # return
+
+    else:
+        raise ValueError('Неверный формат времени')
+        # await msg.delete()
+        # return
+
+    return hour, minutes
+
+def get_autodelete_time_from_str(str_time: str):
+    return str_time.split(':')
+
+def str_time_to_seconds(time_str: str) -> int:
+    try:
+        # Разделяем строку на часы и минуты
+        hours, minutes = map(int, time_str.split(':'))
+    except ValueError:
+        raise ValueError('Неверный формат времени. Используй формат "чч:мм"')
+    total_seconds = hours * 3600 + minutes * 60
+
+    return total_seconds
+

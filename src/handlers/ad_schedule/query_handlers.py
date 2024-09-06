@@ -9,6 +9,7 @@ from loader import dp, userbot, bot
 from states import States
 from utils import db
 from utils.check_admin_rights import is_salesman, is_admin
+from utils.db import delete_additional_posts_by_sale_id
 from utils.time import create_valid_date
 
 
@@ -75,7 +76,7 @@ async def _(query: types.CallbackQuery):
         await query.answer('У тебя нет прав для управления чужими продажами')
         return
 
-    sale_info = await db.sale_info_is_exist(sale_msg_id)
+    sale_info = await db.is_sale_info_exist(sale_msg_id)
 
     chats_and_messages = await db.get_scheduled_posts(sale_msg_id)
     count = 0
@@ -86,4 +87,5 @@ async def _(query: types.CallbackQuery):
     if count == len(chats_and_messages):
         await query.message.edit_reply_markup(keyboards.SaleSettings(sale_info=sale_info))
         await db.delete_scheduled_posts_info(query.message.message_id)
+        await delete_additional_posts_by_sale_id(sale_msg_id)
         await query.answer()

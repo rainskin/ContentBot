@@ -7,7 +7,7 @@ from states import States
 
 
 @dp.callback_query_handler(text='del_channel', state=States.channel_management)
-async def _(query: types.CallbackQuery):
+async def _(query: types.CallbackQuery, state: FSMContext):
     await bot.send_message(query.message.chat.id, 'Нажми на канал, который хочешь удалить', reply_markup=keyboards.Channels())
     await bot.delete_message(query.message.chat.id, query.message.message_id)
     await query.answer()

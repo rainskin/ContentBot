@@ -1,3 +1,5 @@
+from typing import List
+
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
@@ -5,6 +7,10 @@ import keyboards
 from loader import dp, list_of_channels
 from states import States
 from utils import links
+
+
+def get_channels_list_text(channels_names: List[str], channel_links: List[str]):
+    return "\n".join(links.add_links_to_titles(channels_names, channel_links))
 
 
 @dp.message_handler(state=States.get_channels_for_ad)
@@ -29,7 +35,7 @@ async def _(msg: types.Message, state: FSMContext):
         channels.append(title)
 
     if channels:
-        channels_in_text = "\n".join(links.add_links_to_titles(channels, channel_links))
+        channels_in_text = get_channels_list_text(channels, channel_links)
         text = f'Выбраны следующие каналы:\n\n{channels_in_text}\n\nВсе верно?'
         await msg.answer(text, parse_mode='html', reply_markup=keyboards.YesOrNo(), disable_web_page_preview=True)
     elif channel_links:

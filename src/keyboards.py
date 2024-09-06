@@ -2,6 +2,8 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardBu
     ReplyKeyboardRemove
 
 from handlers.channels.start_command import show_channels
+from utils.callback_templates import autodelete_timer_is_template
+from utils.time import get_autodelete_time_from_str
 
 delete_btn = InlineKeyboardButton('Удалить', callback_data='delete_photo')
 replace_btn = InlineKeyboardButton('Переместить в 🔞', callback_data='replace_photo')
@@ -138,22 +140,76 @@ class NotificationOff(InlineKeyboardMarkup):
         self.add(self.button)
 
 
+class InlineKeyboardBuilder(InlineKeyboardMarkup):
+
+    ok_btn = InlineKeyboardButton(text='✅ Готово', callback_data='accept_inline_keyboard')
+    def __init__(self, keyboard_data: str, is_preview: bool = False):
+        super().__init__()
+        rows_data = keyboard_data.strip().split('\n')  # Разделяем по строкам для получения рядов
+        for row_data in rows_data:
+            buttons = []
+            button_datas = [btn.strip() for btn in row_data.strip().split('|')]  # Разделяем ряд по '|'
+            for button_data in button_datas:
+                if button_data:
+                    parts = button_data.strip().split('-', 1)  # Разделяем по первому вхождению '-'
+                    if len(parts) == 2:
+                        text, link = parts
+                        btn = InlineKeyboardButton(text=text.strip(), url=link.strip())
+                        buttons.append(btn)
+                    else:
+                        raise ValueError('Некорректный формат клавитуры')
+            self.row(*buttons)
+        if is_preview:
+            self.add(self.ok_btn)
+
 class AdPostSettings(InlineKeyboardMarkup):
     sound_on = InlineKeyboardButton('🔔 Со звуком: Да', callback_data='toggle_notification')
     sound_of = InlineKeyboardButton('🔕 Со звуком: Нет', callback_data='toggle_notification')
     enable_author = InlineKeyboardButton('👤 Репост: Да', callback_data='toggle_author')
     disable_author = InlineKeyboardButton('🚷 Репост: Нет', callback_data='toggle_author')
 
+    add_inline_keyboard = InlineKeyboardButton('➕ Доб. кнопки', callback_data='add_inline_keyboard')
+    remove_inline_keyboard = InlineKeyboardButton('➖ Убрать кнопки', callback_data='remove_inline_keyboard')
+
+
     start_schedule = InlineKeyboardButton('✅ Запланировать', callback_data='start_schedule')
     cancel_btn = InlineKeyboardButton('❌ Отменить', callback_data='cancel')
 
-    def __init__(self, drop_author: bool, notification: bool):
+    def __init__(self, drop_author: bool, notification: bool, inline_keyboard=False, auto_delete_timer: str = None):
+        if auto_delete_timer:
+            hour, minutes = get_autodelete_time_from_str(auto_delete_timer)
+            autodelete_timer_btn_text = f'Удалить через: {hour}ч {minutes} м'
+        else:
+            autodelete_timer_btn_text = f'Без удаления'
+
+        set_autodelete_timer = InlineKeyboardButton(autodelete_timer_btn_text, callback_data='set_autodelete_timer')
+
         super().__init__()
         notification_btn = self.sound_on if notification else self.sound_of
         author_btn = self.enable_author if drop_author else self.disable_author
-        self.row_width = 2
-        self.add(notification_btn, author_btn, self.start_schedule, self.cancel_btn)
+        inline_keyboard_btn = self.remove_inline_keyboard if inline_keyboard else self.add_inline_keyboard
+        self.row(notification_btn, author_btn )
+        self.row(inline_keyboard_btn)
+        self.row(set_autodelete_timer)
+        self.row(self.start_schedule, self.cancel_btn)
 
+
+class AutodeleteTimerAmount(InlineKeyboardMarkup):
+    callback_template = autodelete_timer_is_template()
+
+    minute_15 = InlineKeyboardButton('15 м', callback_data=f'{callback_template}00:15')
+    minute_30 = InlineKeyboardButton('30 м', callback_data=f'{callback_template}00:30')
+    hour_1 = InlineKeyboardButton('1 ч', callback_data=f'{callback_template}01:00')
+    hour_24 = InlineKeyboardButton('24 ч', callback_data=f'{callback_template}24:00')
+    hour_48 = InlineKeyboardButton('48 ч', callback_data=f'{callback_template}48:00')
+    hour_72 = InlineKeyboardButton('72 ч', callback_data=f'{callback_template}72:00')
+    without_autodelete = InlineKeyboardButton('Без удаления', callback_data=f'without_autodelete')
+
+    def __init__(self):
+        super().__init__()
+        self.row(self.minute_15, self.minute_30, self.hour_1)
+        self.row(self.hour_24, self.hour_48, self.hour_72)
+        self.row(self.without_autodelete)
 
 class AdDate(InlineKeyboardMarkup):
     today = InlineKeyboardButton('Сегодня', callback_data='today')

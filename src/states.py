@@ -37,6 +37,8 @@ class States(StatesGroup):
     waiting_ad_post = State()
     choose_ad_date = State()
     choose_ad_time = State()
+    take_inline_keyboard = State()
+    take_autodelete_timer= State()
     schedule_ad = State()
 
     # add/update sale info

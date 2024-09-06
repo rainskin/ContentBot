@@ -30,9 +30,13 @@ async def _(msg: types.Message, state: FSMContext):
         return
 
     date = create_valid_date(day, current_day, current_month, current_year)
-    text = await get_text_with_valid_date(state, date)
+    month_name = RU_MONTHS_GEN[date.month - 1]
+    await state.update_data(day=date.day, month=date.month, month_name=month_name, year=date.year)
+
+    text = await get_text_for_msg_with_valid_date(date)
     msg_with_date = await msg.answer(text, parse_mode='html')
     await state.update_data(msg_with_date_id=msg_with_date.message_id)
+    await States.choose_ad_time.set()
     await msg.delete()
 
 
@@ -48,21 +52,20 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     elif text == 'yesterday':
         date = date - one_day
 
-    msg_text = await get_text_with_valid_date(state, date)
+    month_name = RU_MONTHS_GEN[date.month - 1]
+    await state.update_data(day=date.day, month=date.month, month_name=month_name, year=date.year)
+
+    msg_text = await get_text_for_msg_with_valid_date(date)
     msg_with_date = await query.message.answer(msg_text, parse_mode='html')
     await query.answer()
     await state.update_data(msg_with_date_id=msg_with_date.message_id)
-
-
-async def get_text_with_valid_date(state: FSMContext, date: datetime) -> str:
-    day = date.day
-
-    month = date.month
-    year = date.year
-    month_name = RU_MONTHS_GEN[date.month - 1]
-    text = f'Выбрана дата <b>{day} {month_name}</b> \n\n Отправь время в формате: <b>19 05</b>'
     await States.choose_ad_time.set()
-    await state.update_data(day=day, month=month, month_name=month_name, year=year)
+
+
+async def get_text_for_msg_with_valid_date(date: datetime) -> str:
+    day = date.day
+    month_name = RU_MONTHS_GEN[date.month - 1]
+    text = f'Выбрана дата <b>{day} {month_name}</b>\n\n Отправь время в формате: <b>19 05</b>'
     return text
 
 

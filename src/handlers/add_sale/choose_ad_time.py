@@ -6,34 +6,17 @@ from loader import dp, bot
 from states import States
 from utils.db import add_sale
 from utils.links import add_links_to_titles
-from utils.time import is_not_correct_time
+from utils.time import is_not_correct_time, get_time_from_msg_text
+from utils.timedelta_parser import parse_hours_and_minutes
 
 
 @dp.message_handler(state=States.choose_ad_time)
 async def _(msg: types.Message, state: FSMContext):
-    time = msg.text
 
-    if len(time) <= 2:
-        try:
-            hour = int(time)
-            minutes = 0
-        except ValueError:
-            await msg.answer('Используй только цифры')
-            await msg.delete()
-            return
-
-    elif 4 <= len(time) <= 5:
-        try:
-            hour = int(time[:2])
-            minutes = int(time[-2:])
-
-        except ValueError:
-            await msg.answer('Используй только цифры')
-            await msg.delete()
-            return
-
-    else:
-        await msg.answer('Неверный формат времени')
+    try:
+        hour, minutes = parse_hours_and_minutes(msg.text)
+    except ValueError as e:
+        await msg.answer(str(e))
         await msg.delete()
         return
 
