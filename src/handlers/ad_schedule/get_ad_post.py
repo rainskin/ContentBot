@@ -55,7 +55,7 @@ async def _(msg: types.Message, state: FSMContext):
 
     link = await links.get_links_from_msg(msg)
 
-    await state.update_data(drop_author=drop_author, notification=notification, inline_keyboard=inline_keyboard, link=link, title=title,
+    await state.update_data(from_chat_id=msg.chat.id, drop_author=drop_author, notification=notification, inline_keyboard=inline_keyboard, link=link, title=title,
                             ad_title_msg_id=ad_title_msg.message_id,
                             ad_title_text=ad_title_text)
     await bot.delete_message(msg.chat.id, service_msg_id)

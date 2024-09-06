@@ -15,7 +15,7 @@ async def _(msg: types.Message):
         return
 
     if msg.chat.id != SALE_GROUP_ID:
-        await msg.answer(texts.schedule_start_command, disable_web_page_preview=True)
+        await msg.answer('Это пока недоступно здесь', disable_web_page_preview=True)
         return
 
     await States.get_channels_for_ad.set()

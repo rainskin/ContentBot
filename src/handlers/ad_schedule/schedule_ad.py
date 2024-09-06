@@ -35,6 +35,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     title = data['title']
     message_markers: list = data['message_markers']
 
+    from_chat_id = data.get('from_chat_id')
     service_msg_ids = data.get('service_msg_ids')
     keyboard_data = data.get('keyboard_data')
     msg_ids_in_data = data['message_id']
@@ -45,18 +46,22 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     notification_status_in_text = '🔕 Без звука' if notification else '🔔 Со звуком'
     drop_author_status_in_text = '🚷 Без автора' if drop_author else '👤 Репост'
 
+    hours, minutes = autodelete_timer.split(':') if autodelete_timer else 0, 0
+    autodelete_timer_in_text = f'<i>🗑 Удалить через</i>: {hours} ч {minutes} мин' if autodelete_timer else '<i>🗑 Без удаления</i>'
+
     schedule_date = await db.get_scheduled_post_datetime(sale_msg_id)
     schedule_date = schedule_date if is_main_post else schedule_date + timedelta(minutes=minute)
 
     ad_title_text = ad_title_text.replace('принят',
-                                          f'\n\n✅ <b>Запланирован</b>\n<i>{notification_status_in_text} | {drop_author_status_in_text}</i>')
+                                          f'\n\n✅ <b>Запланирован</b>\n<i>{notification_status_in_text} | {drop_author_status_in_text}</i>\n'
+                                          f'{autodelete_timer_in_text}')
     msg_id = await userbot.get_msg_ids(query.message.chat.id, msg_ids_in_data[0]) if is_album else msg_ids_in_data
     service_msg = await query.message.answer('...Начинаю планирование')
 
     scheduled_posts = []
 
     for channel_id in channel_ids:
-        scheduled_messages = await userbot.forward_messages(channel_id, config.SALE_GROUP_ID, msg_id,
+        scheduled_messages = await userbot.forward_messages(channel_id, from_chat_id, msg_id,
                                                             schedule_date=schedule_date,
                                                             drop_author=drop_author, disable_notification=notification)
 
@@ -111,7 +116,7 @@ async def delete_messages(chat_id: int, message_ids: int | Iterable[int]):
 
 async def send_report_about_scheduled_posts(chat_id: int, schedule_date: datetime, data: dict):
     text = get_report_text_about_scheduled_posts(schedule_date, data)
-    await bot.send_message(chat_id, text)
+    await bot.send_message(chat_id, text, disable_web_page_preview=True)
 
 
 def get_report_text_about_scheduled_posts(schedule_date: datetime.datetime, data: dict) -> str:

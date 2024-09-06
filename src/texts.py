@@ -13,7 +13,7 @@ cmd_start_text = """
 /upload - загрузка контента в бд
 /schedule - запланировать контент посты в канал
 
-/ad_sale - добавить продажу
+/add_sale - добавить продажу
 """
 
 admin_commands = """
@@ -29,7 +29,7 @@ admin_commands = """
 /upload - загрузка контента в бд
 /schedule - запланировать контент посты в канал
 
-/ad_sale - добавить продажу
+/add_sale - добавить продажу
 """
 
 schedule_start_command = f"""
