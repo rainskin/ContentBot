@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from datetime import datetime, timedelta, tzinfo, timezone
 from typing import List
 
@@ -12,11 +13,11 @@ class AdManager:
 
     def __init__(self):
         self.client = loader.ad_manager_db_client
-
         self.db = self.client[config.MONGO_DB_NAME]
         self.published_posts = self.db['published_posts']
         self.sales = self.db['sales']
         self.bot = loader.bot
+        self.task_counter = 0
 
     async def create_unique_sale_time_idx(self):
         await self.published_posts.create_index(
@@ -27,6 +28,7 @@ class AdManager:
 
     async def setup(self):
         await self.create_unique_sale_time_idx()
+
     def get_all_ads(self):
         return self.published_posts.find()
 
@@ -39,10 +41,10 @@ class AdManager:
         asyncio.create_task(self.schedule_deletion(from_chat, msg_id, deletion_date, sale_msg_id, post_time))
 
     async def check_old_published_ads_and_delete(self):
-        # sec = 36000  # seconds between checks
-        sec = 60  # seconds between checks
-        while True:
+        self.task_counter += 1
+        logging.info(f"Task started. Total tasks running: {self.task_counter}")
 
+        try:
             all_ads = self.get_all_ads()
 
             async for ad in all_ads:
@@ -55,9 +57,21 @@ class AdManager:
                         for message_id in message_ids:
                             await self.delete_post(chat_id, message_id, sale_msg_id, post_time)
 
-                        await self.delete_from_published_sales(sale_msg_id, post_time)
+                    await self.delete_from_published_sales(sale_msg_id, post_time)
 
-            await asyncio.sleep(sec)
+            logging.info("Task finished successfully.")
+
+        except Exception as e:
+            logging.error(f"Error occurred: {e}")
+
+        finally:
+            self.task_counter -= 1
+            logging.info(f"Task ended. Total tasks running: {self.task_counter}")
+
+    async def run_check_ads_task(self):
+        while True:
+            await self.check_old_published_ads_and_delete()  # Выполняем задачу
+            await asyncio.sleep(60)
 
     async def delete_post(self, from_chat, msg_id, sale_msg_id, post_time):
         await self.bot.delete_message(from_chat, msg_id)
