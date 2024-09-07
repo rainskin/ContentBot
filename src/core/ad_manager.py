@@ -9,6 +9,8 @@ import loader
 tasks = set()
 
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
 class AdManager:
 
     def __init__(self):
