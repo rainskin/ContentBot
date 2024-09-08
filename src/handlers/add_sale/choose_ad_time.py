@@ -27,8 +27,10 @@ async def _(msg: types.Message, state: FSMContext):
 
     data = await state.get_data()
 
-    str_minutes = str(minutes) if len(str(minutes)) == 2 else '0' + str(minutes)
-    str_time = str(hour) + ':' + str_minutes
+    str_minutes = f'{minutes:02d}'
+    str_time = f'{hour}:{str_minutes}'
+
+    print(str_time)
 
     #
     day = data['day']

@@ -1,8 +1,10 @@
 import asyncio
 import logging
+import tracemalloc
 from datetime import datetime, timedelta, tzinfo, timezone
 from typing import List
 
+import background_tasks
 import config
 import loader
 
@@ -43,6 +45,7 @@ class AdManager:
         asyncio.create_task(self.schedule_deletion(from_chat, msg_id, deletion_date, sale_msg_id, post_time))
 
     async def check_old_published_ads_and_delete(self):
+        print(f'Первый счетчик задач: {len(background_tasks.tasks)}')
         self.task_counter += 1
         logging.info(f"Task started. Total tasks running: {self.task_counter}")
 
@@ -146,5 +149,6 @@ class AdManager:
     async def delete_from_published_sales(self, sale_msg_id, post_time):
         await self.published_posts.delete_one({'sale_msg_id': sale_msg_id, 'time': post_time})
 
-
+    async def collect_all_ads_posts(self, chat_ids: list[int]):
+        await self.bot.mess
 ad_manager = AdManager()

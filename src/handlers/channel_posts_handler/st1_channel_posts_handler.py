@@ -1,4 +1,6 @@
+import asyncio
 import datetime
+import logging
 from datetime import datetime
 from typing import List
 
@@ -59,10 +61,9 @@ async def process_sale(chat_id: int, messages: list[types.Message], sale: dict):
     if not autodelete_time:
         return
 
-    if await ad_manager.sale_is_published(sale_msg_id, time):
-        if await ad_manager.post_is_published(sale_msg_id, time, chat_id, msg_ids):
-            return
-    else:
+    if not await ad_manager.sale_is_published(sale_msg_id, time):
+        # if await ad_manager.post_is_published(sale_msg_id, time, chat_id, msg_ids):
+        #     return
         try:
             await ad_manager.register_published_ad(sale_msg_id, time, autodelete_time)
         except DuplicateKeyError:
@@ -92,6 +93,7 @@ async def func(msg: types.Message):
     sales_for_same_time = await sales.get_all_sales_by_date_and_time(date, time)
     if sales_for_same_time:
         for sale in sales_for_same_time:
-            await process_sale(chat_id, messages, sale)
+            asyncio.create_task(process_sale(chat_id, messages, sale))
+
     else:
         return

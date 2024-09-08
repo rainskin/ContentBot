@@ -4,7 +4,7 @@ BASE_URL = 'https://gateway.reddit.com/desktopapi/v1/subreddits/ecchi'
 
 # noinspection SpellCheckingInspection
 HEADERS = {
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
+    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/113.0',
 }
 
 PARAMS = {
@@ -16,12 +16,14 @@ PARAMS = {
 
 async def get_pictures() -> list[str]:
     client = httpx.AsyncClient(params=PARAMS, headers=HEADERS)
-
+    print('Getting', client)
     async with client:
         resp = await client.get(BASE_URL)
+        print(f'Делаю запрос, запрос = {resp}')
 
     result = resp.json()
     posts = result['posts'].values()
+    print(f'посты = {posts}')
     return _parse_pictures(posts)
 
 

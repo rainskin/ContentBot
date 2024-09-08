@@ -114,8 +114,8 @@ async def add_ad_additional_posts(
         autodelete_timer):
     day, month, year, hour, minute = dt.day, dt.month, dt.year, dt.hour, dt.minute
 
-    date: str = '{}-{}-{}'.format(str(day), str(month), str(year))
-    time: str = '{}:{}'.format(str(hour), str(minute))
+    date: str = f'{day}-{month}-{year}'
+    time: str = f'{hour}:{minute:02d}'
 
     sale = sales.find_one({'sale_msg_id': sale_msg_id})
     exists_post = sale['scheduled_posts']
