@@ -93,7 +93,7 @@ async def process_message(chat_id, msg, sale):
     if not await sales.is_scheduled_post(sale_id):
         return
 
-    marker = get_marker(sale)
+    marker = get_marker(msg)
 
     markers = await sales.get_msg_markers(sale_id)
     if marker not in markers:
@@ -133,6 +133,6 @@ async def func(msg: types.Message):
 
     for sale in sales_for_same_time:
         # asyncio.create_task(process_sale(chat_id, messages, sale))
-        asyncio.create_task(process_message(chat_id, msg, sale))
+        await asyncio.create_task(process_message(chat_id, msg, sale))
 
     logging.info(f'Закончил обработку поста в {msg.chat.title}')
