@@ -46,32 +46,24 @@ class AdManager:
 
     async def check_old_published_ads_and_delete(self):
         print(f'Первый счетчик задач: {len(background_tasks.tasks)}')
-        self.task_counter += 1
         logging.info(f"Task started. Total tasks running: {self.task_counter}")
 
-        try:
-            all_ads = self.get_all_ads()
+        all_ads = self.get_all_ads()
 
-            async for ad in all_ads:
-                deletion_date = ad.get('deletion_date')
-                current_datetime = datetime.now()
-                if current_datetime > deletion_date:
-                    sale_msg_id = ad.get('sale_msg_id')
-                    post_time = ad.get('time')
-                    for chat_id, message_ids in ad['published_posts'].items():
-                        for message_id in message_ids:
+        async for ad in all_ads:
+            deletion_date = ad.get('deletion_date')
+            current_datetime = datetime.now()
+            if current_datetime > deletion_date:
+                sale_msg_id = ad.get('sale_msg_id')
+                post_time = ad.get('time')
+                for chat_id, message_ids in ad['published_posts'].items():
+                    for message_id in message_ids:
+                        try:
                             await self.delete_post(chat_id, message_id, sale_msg_id, post_time)
+                            await self.delete_from_published_sales(sale_msg_id, post_time)
+                        except Exception as e:
+                            logging.error(f"Error occurred: {e}")
 
-                    await self.delete_from_published_sales(sale_msg_id, post_time)
-
-            logging.info("Task finished successfully.")
-
-        except Exception as e:
-            logging.error(f"Error occurred: {e}")
-
-        finally:
-            self.task_counter -= 1
-            logging.info(f"Task ended. Total tasks running: {self.task_counter}")
 
     async def run_check_ads_task(self):
         while True:

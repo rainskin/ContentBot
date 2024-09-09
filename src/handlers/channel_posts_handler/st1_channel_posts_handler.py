@@ -76,6 +76,7 @@ async def process_sale(chat_id: int, messages: list[types.Message], sale: dict):
 @dp.channel_post_handler(content_types=types.ContentType.ANY)
 async def func(msg: types.Message):
     chat_id = msg.chat.id
+    logging.info(f'фиксирую пост в {msg.chat.title}')
 
     if chat_id not in db.get_ids_of_all_channels():
         return
@@ -90,6 +91,7 @@ async def func(msg: types.Message):
     date = sale_data.get('date')
     time = sale_data.get('time')
 
+
     sales_for_same_time = await sales.get_all_sales_by_date_and_time(date, time)
     if sales_for_same_time:
         for sale in sales_for_same_time:
@@ -97,3 +99,5 @@ async def func(msg: types.Message):
 
     else:
         return
+
+    logging.info(f'Закончил обработку поста в {msg.chat.title}')
