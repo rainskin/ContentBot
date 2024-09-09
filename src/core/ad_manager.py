@@ -63,6 +63,7 @@ class AdManager:
                             await self.delete_from_published_sales(sale_msg_id, post_time)
                         except Exception as e:
                             logging.error(f"Error occurred: {e}")
+                            logging.error(f"sale msg id {sale_msg_id} time {post_time}")
 
 
     async def run_check_ads_task(self):
