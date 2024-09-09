@@ -137,9 +137,8 @@ class AdManager:
 
         await self.published_posts.find_one_and_update(
             {'sale_msg_id': sale_msg_id, 'time': time},
-            {'$addToSet': {f'published_posts.{chat_id}': {'$push': msg_id}}},
-            upsert=True
-        )
+            {'$push': {f'published_posts.{chat_id}': msg_id}}, upsert=True)
+
 
 
 
