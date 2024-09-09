@@ -134,8 +134,9 @@ def get_report_text_about_scheduled_posts(schedule_date: datetime.datetime, data
 
     header = f'📋 Пост <b>«{title}»</b>'
     schedule_day = schedule_date.day
+    schedule_month = schedule_date.month
     schedule_time = schedule_date.time()
-    date = f'{schedule_day} {RU_MONTHS_GEN[schedule_day]} {schedule_time.hour}:{schedule_time.minute:02d}'
+    date = f'{schedule_day} {RU_MONTHS_GEN[schedule_month]} {schedule_time.hour}:{schedule_time.minute:02d}'
     text = (f'{header}\n'
             f'Будет опубликован <b>{date}</b> в следующих каналах:\n\n'
             f'{channel_list}')
