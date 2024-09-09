@@ -21,7 +21,6 @@ class AdManager:
         self.published_posts = self.db['published_posts']
         self.sales = self.db['sales']
         self.bot = loader.bot
-        self.task_counter = 0
 
     async def create_unique_sale_time_idx(self):
         await self.published_posts.create_index(
@@ -46,7 +45,6 @@ class AdManager:
 
     async def check_old_published_ads_and_delete(self):
         print(f'Первый счетчик задач: {len(background_tasks.tasks)}')
-        logging.info(f"Task started. Total tasks running: {self.task_counter}")
 
         all_ads = self.get_all_ads()
 
@@ -135,6 +133,16 @@ class AdManager:
             upsert=True
         )
 
+    async def add_to_published_posts_one_message(self, sale_msg_id: int, time: str, chat_id: int, msg_id: int):
+
+        await self.published_posts.find_one_and_update(
+            {'sale_msg_id': sale_msg_id, 'time': time},
+            {'$addToSet': {f'published_posts.{chat_id}': {'$push': msg_id}}},
+            upsert=True
+        )
+
+
+
     async def delete_from_published_posts(self, from_chat: int, msg_id: int, sale_msg_id: int, time: str):
         await self.published_posts.update_one({'sale_msg_id': sale_msg_id, 'time': time},
                                               {'$pull': {f'published_posts.{from_chat}': msg_id}})
@@ -142,6 +150,8 @@ class AdManager:
     async def delete_from_published_sales(self, sale_msg_id, post_time):
         await self.published_posts.delete_one({'sale_msg_id': sale_msg_id, 'time': post_time})
 
-    async def collect_all_ads_posts(self, chat_ids: list[int]):
-        await self.bot.mess
+    # async def collect_all_ads_posts(self, chat_ids: list[int]):
+    #     await self.bot.mess
+
+
 ad_manager = AdManager()

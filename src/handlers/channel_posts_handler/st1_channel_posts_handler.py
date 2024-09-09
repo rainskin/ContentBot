@@ -73,6 +73,44 @@ async def process_sale(chat_id: int, messages: list[types.Message], sale: dict):
     await ad_manager.add_to_published_posts(sale_msg_id, time, chat_id, msg_ids)
 
 
+async def process_message(chat_id, msg, sale):
+    channel_ids = sale.get('channel_ids')
+
+    if chat_id not in channel_ids:
+        return
+
+    if not msg:
+        return
+
+    sale_id = sale.get('_id')
+
+    sale_msg_id, time = await sales.get_sale_msg_id_and_time_by_sale_id(sale_id)
+    autodelete_time = await sales.get_autodelete_time(sale_id)
+
+    if not autodelete_time:
+        return
+
+    if not await sales.is_scheduled_post(sale_id):
+        return
+
+    marker = get_marker(sale)
+
+    markers = await sales.get_msg_markers(sale_id)
+    if marker not in markers:
+        return
+
+    if not await ad_manager.sale_is_published(sale_msg_id, time):
+        try:
+            await ad_manager.register_published_ad(sale_msg_id, time, autodelete_time)
+        except DuplicateKeyError:
+            return
+
+    if not msg.media_group_id:
+        await add_keyboard(chat_id, msg.message_id, sale_id)
+
+    await ad_manager.add_to_published_posts_one_message(sale_msg_id, time, chat_id, msg.message_id)
+
+
 @dp.channel_post_handler(content_types=types.ContentType.ANY)
 async def func(msg: types.Message):
     chat_id = msg.chat.id
@@ -81,7 +119,7 @@ async def func(msg: types.Message):
     if chat_id not in db.get_ids_of_all_channels():
         return
 
-    messages = await collect_media_group(msg)
+    # messages = await collect_media_group(msg)
 
     closer_sale_id = await sales.get_closer_sale_id(datetime.now())
     if not closer_sale_id:
@@ -91,13 +129,10 @@ async def func(msg: types.Message):
     date = sale_data.get('date')
     time = sale_data.get('time')
 
-
     sales_for_same_time = await sales.get_all_sales_by_date_and_time(date, time)
-    if sales_for_same_time:
-        for sale in sales_for_same_time:
-            asyncio.create_task(process_sale(chat_id, messages, sale))
 
-    else:
-        return
+    for sale in sales_for_same_time:
+        # asyncio.create_task(process_sale(chat_id, messages, sale))
+        asyncio.create_task(process_message(chat_id, msg, sale))
 
     logging.info(f'Закончил обработку поста в {msg.chat.title}')
