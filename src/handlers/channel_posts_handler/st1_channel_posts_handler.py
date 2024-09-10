@@ -115,7 +115,6 @@ async def process_message(chat_id, msg, sale):
 @dp.channel_post_handler(content_types=types.ContentType.ANY)
 async def func(msg: types.Message):
     chat_id = msg.chat.id
-    c
     logging.info(f'фиксирую пост в {msg.chat.title}')
 
     if chat_id not in db.get_ids_of_all_channels():
