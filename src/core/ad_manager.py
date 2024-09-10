@@ -10,17 +10,24 @@ import loader
 
 tasks = set()
 
-
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
 
 class AdManager:
 
     def __init__(self):
         self.client = loader.ad_manager_db_client
         self.db = self.client[config.MONGO_DB_NAME]
+        self.saved_posts = self.db['saved_posts']
         self.published_posts = self.db['published_posts']
         self.sales = self.db['sales']
         self.bot = loader.bot
+
+    async def save_posts(self, date: datetime, chat_id: int, msg_ids: list[int]):
+        doc = {'date': date,
+               'chat_id': chat_id,
+               'msg_ids': msg_ids}
+        await self.saved_posts.insert_one(doc)
 
     async def create_unique_sale_time_idx(self):
         await self.published_posts.create_index(
@@ -61,7 +68,6 @@ class AdManager:
                         except Exception as e:
                             logging.error(f"Error occurred: {e}")
                             logging.error(f"sale msg id {sale_msg_id} time {post_time}")
-
 
     async def run_check_ads_task(self):
         while True:
@@ -137,9 +143,6 @@ class AdManager:
         await self.published_posts.find_one_and_update(
             {'sale_msg_id': sale_msg_id, 'time': time},
             {'$push': {f'published_posts.{chat_id}': msg_id}}, upsert=True)
-
-
-
 
     async def delete_from_published_posts(self, from_chat: int, msg_id: int, sale_msg_id: int, time: str):
         await self.published_posts.update_one({'sale_msg_id': sale_msg_id, 'time': time},
