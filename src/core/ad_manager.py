@@ -44,7 +44,6 @@ class AdManager:
         asyncio.create_task(self.schedule_deletion(from_chat, msg_id, deletion_date, sale_msg_id, post_time))
 
     async def check_old_published_ads_and_delete(self):
-        print(f'Первый счетчик задач: {len(background_tasks.tasks)}')
 
         all_ads = self.get_all_ads()
 

@@ -25,5 +25,8 @@ async def check_memory_usage(timeout_seconds):
 
 async def check_task_amount(timeout_seconds: int):
     while True:
+        all_tasks = asyncio.all_tasks()
         logging.info(f"Количество активных задач: {len(asyncio.all_tasks())}")
+        for task in all_tasks:
+            logging.info(f'{task}')
         await asyncio.sleep(timeout_seconds)
