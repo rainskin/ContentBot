@@ -4,9 +4,11 @@ import tracemalloc
 from datetime import datetime, timedelta, tzinfo, timezone
 from typing import List
 
-import background_tasks
+from aiogram import types
+
 import config
 import loader
+from utils.msg_marker import get_marker
 
 tasks = set()
 
@@ -23,10 +25,16 @@ class AdManager:
         self.sales = self.db['sales']
         self.bot = loader.bot
 
-    async def save_posts(self, date: datetime, chat_id: int, msg_ids: list[int]):
+    async def save_posts(self, date: datetime, chat_id: int, messages: list[types.Message]):
+
+        markers = [get_marker(m) for m in messages]
+        msg_ids = [m.message_id for m in messages]
+
         doc = {'date': date,
                'chat_id': chat_id,
+               'markers': markers,
                'msg_ids': msg_ids}
+
         await self.saved_posts.insert_one(doc)
 
     async def create_unique_sale_time_idx(self):

@@ -115,13 +115,12 @@ async def process_message(chat_id, msg, sale):
 @dp.channel_post_handler(content_types=types.ContentType.ANY)
 async def func(msg: types.Message):
     chat_id = msg.chat.id
-    logging.info(f'фиксирую пост в {msg.chat.title}')
 
     if chat_id not in db.get_ids_of_all_channels():
         return
 
     messages = await collect_media_group(msg)
-
+    logging.info(f'Начал обработку в {messages[0].chat.title}, кол-во сообщений {len(messages)}')
     date = messages[0].date
     await ad_manager.save_posts(date, chat_id, messages)
 
@@ -137,10 +136,11 @@ async def func(msg: types.Message):
     sales_for_same_time = await sales.get_all_sales_by_date_and_time(date, time)
 
     for sale in sales_for_same_time:
-        asyncio.create_task(process_sale(chat_id, messages, sale))
+        await asyncio.create_task(process_sale(chat_id, messages, sale))
         await asyncio.sleep(3)
 
     logging.info(f'Закончил обработку поста в {messages[0].chat.title}')
+
 
 #
 # @dp.channel_post_handler(content_types=types.ContentType.ANY)
