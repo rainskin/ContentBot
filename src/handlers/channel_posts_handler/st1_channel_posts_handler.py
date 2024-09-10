@@ -109,6 +109,7 @@ async def process_message(chat_id, msg, sale):
         await add_keyboard(chat_id, msg.message_id, sale_id)
 
     await ad_manager.add_to_published_posts_one_message(sale_msg_id, time, chat_id, msg.message_id)
+    logging.info(f'Задача должна была завершиться')
 
 
 @dp.channel_post_handler(content_types=types.ContentType.ANY)
@@ -133,6 +134,6 @@ async def func(msg: types.Message):
 
     for sale in sales_for_same_time:
         # asyncio.create_task(process_sale(chat_id, messages, sale))
-        await asyncio.create_task(process_message(chat_id, msg, sale))
+        asyncio.create_task(process_message(chat_id, msg, sale))
 
     logging.info(f'Закончил обработку поста в {msg.chat.title}')
