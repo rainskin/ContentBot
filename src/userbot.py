@@ -1,4 +1,5 @@
-from datetime import datetime
+import asyncio
+from datetime import datetime, timedelta
 from typing import Any, Iterable, cast, Union
 
 import pyrogram
@@ -22,6 +23,9 @@ import loader
 class Client(pyrogram.Client):
     def __init__(self, session_string: str):
         super().__init__('userbot', session_string=session_string)  # type: ignore
+
+    # async def send_message(self):
+    #     await self.send_message()
 
     async def forward_messages(
             self,
@@ -67,6 +71,13 @@ class Userbot:
     def __init__(self):
         self.app = Client(session_string=config.USERBOT_SESSION_STRING)
 
+    async def send_message(self, chat_id: int | str, text: str):
+        try:
+            await self.app.start()
+        except ConnectionError:
+            pass
+        await self.app.send_message(chat_id, text, parse_mode=ParseMode.HTML)
+
     async def copy(self, chat_id, date):
         app = self.app
         try:
@@ -82,7 +93,6 @@ class Userbot:
         if caption:
             msg_caption = msg.caption if msg.caption else ''
             caption = msg_caption + caption
-
 
         chat = await app.get_chat(-1001738529532)
         try:
@@ -294,6 +304,27 @@ class Userbot:
 
         async for msg in app.get_chat_history(chat_id, limit):
             print(msg.text)
+
+    # async def create_tests(self, bot_id: int):
+    #     app = self.app
+    #     try:
+    #         await app.start()
+    #     except ConnectionError:
+    #         pass
+    #
+    #     print("start")
+    #
+    #
+    #
+    #     date = datetime.now() + timedelta(seconds=60)
+    #
+    #     for channel_id in channel_ids:
+    #         await app.send_message(channel_id, "3", schedule_date=date)
+    #         # await asyncio.sleep(1)
+    #         print(channel_id)
+    #         # break
+    #
+    #     print("done")
 
 
 userbot = Userbot()
