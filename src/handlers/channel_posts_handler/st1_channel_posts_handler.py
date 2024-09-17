@@ -83,7 +83,7 @@ async def func(msg: types.Message):
 
     # logging.info(f'Начал обработку в {messages[0].chat.title}, кол-во сообщений {len(messages)}')
     date = messages[0].date
-    await ad_manager.save_posts(date, chat_id, messages)
+    # await ad_manager.save_posts(date, chat_id, messages)
 
     closer_sale_id = await sales.get_closer_sale_id(date)
 
