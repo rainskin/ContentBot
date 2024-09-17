@@ -20,7 +20,7 @@ class AdManager:
     def __init__(self):
         self.client = loader.ad_manager_db_client
         self.db = self.client[config.MONGO_DB_NAME]
-        self.list_of_channels = self.db['list_of_channels']
+        self.list_of_channels = self.db['list of channels']
         self.saved_posts = self.db['saved_posts']
         self.published_posts = self.db['published_posts']
         self.sales = self.db['sales']

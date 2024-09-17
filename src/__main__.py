@@ -27,4 +27,4 @@ async def on_startup(dp):
 
 
 # Запуск бота
-executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
+executor.start_polling(dp, skip_updates=True, on_startup=on_startup, allowed_updates=[])
