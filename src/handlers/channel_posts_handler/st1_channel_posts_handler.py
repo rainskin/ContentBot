@@ -73,6 +73,7 @@ async def process_sale(chat_id: int, messages: list[types.Message], sale: dict):
 async def func(msg: types.Message):
     messages = await collect_media_group(msg)
     chat_id = msg.chat.id
+
     if chat_id not in await ad_manager.get_ids_of_all_channels():
         return
 
@@ -81,7 +82,7 @@ async def func(msg: types.Message):
 
     await asyncio.sleep((len(messages) * 2))  # waiting for all posts to come out
 
-    # logging.info(f'Начал обработку в {messages[0].chat.title}, кол-во сообщений {len(messages)}')
+    logging.info(f'Начал обработку в {messages[0].chat.title}, кол-во сообщений {len(messages)}')
     date = messages[0].date
     # await ad_manager.save_posts(date, chat_id, messages)
 
@@ -100,4 +101,4 @@ async def func(msg: types.Message):
         asyncio.create_task(process_sale(chat_id, messages, sale))
         await asyncio.sleep(3)
 
-    # logging.info(f'Закончил обработку поста в {messages[0].chat.title}')
+    logging.info(f'Закончил обработку поста в {messages[0].chat.title}')
