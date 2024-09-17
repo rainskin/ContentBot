@@ -27,7 +27,7 @@ class AdManager:
         self.bot = loader.bot
 
     async def get_ids_of_all_channels(self) -> List[int]:
-        return self.list_of_channels.distinct('id')
+        return await self.list_of_channels.distinct('id')
 
     async def save_posts(self, date: datetime, chat_id: int, messages: list[types.Message]):
 
