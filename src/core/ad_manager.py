@@ -20,10 +20,14 @@ class AdManager:
     def __init__(self):
         self.client = loader.ad_manager_db_client
         self.db = self.client[config.MONGO_DB_NAME]
+        self.list_of_channels = self.db['list_of_channels']
         self.saved_posts = self.db['saved_posts']
         self.published_posts = self.db['published_posts']
         self.sales = self.db['sales']
         self.bot = loader.bot
+
+    async def get_ids_of_all_channels(self) -> List[int]:
+        return self.list_of_channels.distinct('id')
 
     async def save_posts(self, date: datetime, chat_id: int, messages: list[types.Message]):
 

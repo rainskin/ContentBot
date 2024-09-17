@@ -22,7 +22,6 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     is_album = data['is_album']
     is_main_post = data['is_main_post']
-    link = data['link']  # !!!!
 
     sale_msg_id = data['sale_msg_id']
     minute = data['minute'] if 'minute' in data else 0
@@ -32,25 +31,18 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     sale_data = sales.find_one({'sale_msg_id': sale_msg_id})
     channel_ids = sale_data['channel_ids']
     data['channel_ids'] = channel_ids
-    title = data['title']
-    message_markers: list = data['message_markers']
 
     from_chat_id = data.get('from_chat_id')
     service_msg_ids = data.get('service_msg_ids')
-    keyboard_data = data.get('keyboard_data')
     msg_ids_in_data = data['message_id']
     drop_author = not data['drop_author']
     notification = not data['notification']
     autodelete_timer: str = data.get('autodelete_timer')
-    autodelete_time_in_sec = str_time_to_seconds(autodelete_timer) if autodelete_timer else None
     notification_status_in_text = '🔕 Без звука' if notification else '🔔 Со звуком'
     drop_author_status_in_text = '🚷 Без автора' if drop_author else '👤 Репост'
 
     hours, minutes = autodelete_timer.split(':') if autodelete_timer else (0, 0)
 
-    print(autodelete_timer)
-    print(hours)
-    print(minutes)
     autodelete_timer_in_text = f'<i>🗑 Удалить через</i>: {hours} ч {minutes} мин' if autodelete_timer else '<i>🗑 Без удаления</i>'
 
     schedule_date = await db.get_scheduled_post_datetime(sale_msg_id)
@@ -71,22 +63,15 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
         scheduled_posts += scheduled_messages
 
-    if is_main_post:
-        await db.add_ad_post_info(sale_msg_id, title, link, keyboard_data, message_markers, scheduled_posts,
-                                  autodelete_time_in_sec)
-        sale_info = await db.is_sale_info_exist(sale_msg_id)
-        await bot.edit_message_reply_markup(query.message.chat.id, sale_msg_id,
-                                            reply_markup=keyboards.SaleSettings(sale_info=sale_info,
-                                                                                ad_is_scheduled=True))
+    await update_scheduled_post_info(is_main_post, data, schedule_date, scheduled_posts)
 
-    else:
-        await db.add_ad_additional_posts(sale_msg_id, schedule_date, title, keyboard_data, message_markers,
-                                         scheduled_posts, autodelete_time_in_sec)
+    if is_main_post:
+        await update_sale_message_keyboard(query, sale_msg_id)
+
     await state.finish()
 
     if service_msg_ids:
         await delete_messages(query.message.chat.id, service_msg_ids)
-
 
     await delete_messages(query.message.chat.id, msg_id)
     await bot.edit_message_text(ad_title_text, query.message.chat.id, ad_title_msg_id,
@@ -136,9 +121,33 @@ def get_report_text_about_scheduled_posts(schedule_date: datetime.datetime, data
     schedule_day = schedule_date.day
     schedule_month = schedule_date.month
     schedule_time = schedule_date.time()
-    date = f'{schedule_day} {RU_MONTHS_GEN[schedule_month-1]} {schedule_time.hour}:{schedule_time.minute:02d}'
+    date = f'{schedule_day} {RU_MONTHS_GEN[schedule_month - 1]} {schedule_time.hour}:{schedule_time.minute:02d}'
     text = (f'{header}\n'
             f'Будет опубликован <b>{date}</b> в следующих каналах:\n\n'
             f'{channel_list}')
 
     return text
+
+
+async def update_scheduled_post_info(is_main_post: bool, data: dict, schedule_date: datetime, scheduled_posts: list):
+    sale_msg_id = data['sale_msg_id']
+    autodelete_timer: str = data.get('autodelete_timer')
+    link = data['link']  # !!!!
+    title = data['title']
+    message_markers: list = data['message_markers']
+    keyboard_data = data.get('keyboard_data')
+
+    autodelete_time_in_sec = str_time_to_seconds(autodelete_timer) if autodelete_timer else None
+    if is_main_post:
+        await db.add_ad_post_info(sale_msg_id, title, link, keyboard_data, message_markers, scheduled_posts,
+                                  autodelete_time_in_sec)
+    else:
+        await db.add_ad_additional_posts(sale_msg_id, schedule_date, title, keyboard_data, message_markers,
+                                         scheduled_posts, autodelete_time_in_sec)
+
+
+async def update_sale_message_keyboard(query: types.CallbackQuery, sale_msg_id: int):
+    sale_info = await db.is_sale_info_exist(sale_msg_id)
+    await bot.edit_message_reply_markup(query.message.chat.id, sale_msg_id,
+                                        reply_markup=keyboards.SaleSettings(sale_info=sale_info,
+                                                                            ad_is_scheduled=True))
