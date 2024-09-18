@@ -98,7 +98,7 @@ class AdManager:
         try:
             await userbot.delete_messages(from_chat, msg_ids)
         except pyrogram.errors.PeerIdInvalid as e:
-            logging.info(f'{e}, пропускаю')
+            logging.info(f'[400 PEER_ID_INVALID], пропускаю // {sale_msg_id}, {post_time}')
             return
 
         for msg_id in msg_ids:
