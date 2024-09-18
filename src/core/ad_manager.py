@@ -87,7 +87,7 @@ class AdManager:
 
     async def all_posts_deleted(self, sale_msg_id: int, post_time: str):
         doc = await self.published_posts.find_one({'sale_msg_id': sale_msg_id, 'time': post_time})
-        return not bool(doc.get('published_posts'))
+        return not bool(doc.get('published_posts')) if doc else True
 
     async def run_check_ads_task(self):
         while True:
@@ -110,8 +110,10 @@ class AdManager:
 
     async def published_posts_deleted(self, chat_id: int, sale_msg_id: int, time: str):
         doc = await self.published_posts.find_one({'sale_msg_id': sale_msg_id, 'time': time})
+        if not doc:
+            return True
         published_posts = doc.get('published_posts')
-        return not bool(published_posts.get(str(chat_id))) if doc else True
+        return not bool(published_posts.get(str(chat_id))) if published_posts else True
 
     async def schedule_deletion(self, from_chat: int, msg_id: int, deletion_date: datetime, sale_msg_id: int,
                                 post_time: str):
