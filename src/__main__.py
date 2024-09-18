@@ -15,7 +15,7 @@ handlers.setup()
 async def on_startup(dp):
     # Запуск фоновой задачи для проверки памяти
     asyncio.create_task(check_memory_usage(60*60))
-    # asyncio.create_task(check_task_amount(60*60))
+    asyncio.create_task(check_task_amount(60*60))
 
     # Запуск фоновых задач бота
     await background_tasks.start()
