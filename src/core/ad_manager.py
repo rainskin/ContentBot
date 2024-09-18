@@ -4,6 +4,7 @@ import tracemalloc
 from datetime import datetime, timedelta, tzinfo, timezone
 from typing import List
 
+import pyrogram.errors
 from aiogram import types
 
 import config
@@ -76,10 +77,17 @@ class AdManager:
                 for chat_id, message_ids in ad['published_posts'].items():
                     try:
                         await self.delete_post(chat_id, message_ids, sale_msg_id, post_time)
-                        await self.delete_from_published_sales(sale_msg_id, post_time)
+
                     except Exception as e:
                         logging.error(f"Error occurred: {e}")
                         logging.error(f"sale msg id {sale_msg_id} time {post_time}")
+
+                    if await self.all_posts_deleted(sale_msg_id, post_time):
+                        await self.delete_from_published_sales(sale_msg_id, post_time)
+
+    async def all_posts_deleted(self, sale_msg_id: int, post_time: str):
+        doc = await self.published_posts.find_one({'sale_msg_id': sale_msg_id, 'time': post_time})
+        return not bool(doc.get('published_posts'))
 
     async def run_check_ads_task(self):
         while True:
@@ -87,10 +95,23 @@ class AdManager:
             await asyncio.sleep(60)
 
     async def delete_post(self, from_chat, msg_ids: list[int], sale_msg_id, post_time):
-        await userbot.delete_messages(from_chat, msg_ids)
+        try:
+            await userbot.delete_messages(from_chat, msg_ids)
+        except pyrogram.errors.PeerIdInvalid as e:
+            logging.info(f'{e}, пропускаю')
+            return
 
         for msg_id in msg_ids:
             await self.delete_from_published_posts(from_chat, msg_id, sale_msg_id, post_time)
+
+        if await self.published_posts_deleted(from_chat, sale_msg_id, post_time):
+            await self.published_posts.update_one({'sale_msg_id': sale_msg_id, 'time': post_time},
+                                                  {'$unset': {'published_posts': from_chat}})
+
+    async def published_posts_deleted(self, chat_id: int, sale_msg_id: int, time: str):
+        doc = await self.published_posts.find_one({'sale_msg_id': sale_msg_id, 'time': time})
+        published_posts = doc.get('published_posts')
+        return not bool(published_posts.get(str(chat_id)))
 
     async def schedule_deletion(self, from_chat: int, msg_id: int, deletion_date: datetime, sale_msg_id: int,
                                 post_time: str):
@@ -162,8 +183,8 @@ class AdManager:
         await self.published_posts.update_one({'sale_msg_id': sale_msg_id, 'time': time},
                                               {'$pull': {f'published_posts.{from_chat}': msg_id}})
 
-    async def delete_from_published_sales(self, sale_msg_id, post_time):
-        await self.published_posts.delete_one({'sale_msg_id': sale_msg_id, 'time': post_time})
+    async def delete_from_published_sales(self, sale_msg_id, time):
+        await self.published_posts.delete_one({'sale_msg_id': sale_msg_id, 'time': time})
 
     # async def collect_all_ads_posts(self, chat_ids: list[int]):
     #     await self.bot.mess
