@@ -21,10 +21,7 @@ async def on_startup(dp):
     await background_tasks.start()
     await ad_manager.setup()
     await bot.delete_webhook()
-    print(1)
 
     print('Задачи запущены')
 
-
-# Запуск бота
 executor.start_polling(dp, skip_updates=True, on_startup=on_startup, allowed_updates=[])

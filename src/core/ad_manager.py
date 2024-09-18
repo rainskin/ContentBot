@@ -8,6 +8,7 @@ from aiogram import types
 
 import config
 import loader
+from loader import userbot
 from utils.msg_marker import get_marker
 
 tasks = set()
@@ -73,22 +74,23 @@ class AdManager:
                 sale_msg_id = ad.get('sale_msg_id')
                 post_time = ad.get('time')
                 for chat_id, message_ids in ad['published_posts'].items():
-                    for message_id in message_ids:
-                        try:
-                            await self.delete_post(chat_id, message_id, sale_msg_id, post_time)
-                            await self.delete_from_published_sales(sale_msg_id, post_time)
-                        except Exception as e:
-                            logging.error(f"Error occurred: {e}")
-                            logging.error(f"sale msg id {sale_msg_id} time {post_time}")
+                    try:
+                        await self.delete_post(chat_id, message_ids, sale_msg_id, post_time)
+                        await self.delete_from_published_sales(sale_msg_id, post_time)
+                    except Exception as e:
+                        logging.error(f"Error occurred: {e}")
+                        logging.error(f"sale msg id {sale_msg_id} time {post_time}")
 
     async def run_check_ads_task(self):
         while True:
             await self.check_old_published_ads_and_delete()  # Выполняем задачу
             await asyncio.sleep(60)
 
-    async def delete_post(self, from_chat, msg_id, sale_msg_id, post_time):
-        await self.bot.delete_message(from_chat, msg_id)
-        await self.delete_from_published_posts(from_chat, msg_id, sale_msg_id, post_time)
+    async def delete_post(self, from_chat, msg_ids: list[int], sale_msg_id, post_time):
+        await userbot.delete_messages(from_chat, msg_ids)
+
+        for msg_id in msg_ids:
+            await self.delete_from_published_posts(from_chat, msg_id, sale_msg_id, post_time)
 
     async def schedule_deletion(self, from_chat: int, msg_id: int, deletion_date: datetime, sale_msg_id: int,
                                 post_time: str):

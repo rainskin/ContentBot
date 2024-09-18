@@ -50,6 +50,24 @@ class Sales:
 
         return _id
 
+    async def get_closest_sales(self, post_datatime: datetime, time_period_in_minutes: int) -> list:
+        time_period_in_seconds = time_period_in_minutes * 60
+        today_sales = await self.get_sales_for_specified_date(datetime.now())
+        yesterday_sales = await self.get_sales_for_specified_date(datetime.now() - timedelta(days=1))
+        tomorrow_sales = await self.get_sales_for_specified_date(datetime.now() + timedelta(days=1))
+
+        closer_sales = yesterday_sales + today_sales + tomorrow_sales
+        closest_sales = []
+        for doc in closer_sales:
+            date = doc.get('date')
+            time = doc.get('time')
+            sale_date = datetime.strptime(f'{date} {time}', self.default_datetime_format)
+            time_difference: float = abs((post_datatime - sale_date).total_seconds())
+            if 0 <= time_difference <= time_period_in_seconds:
+                closest_sales.append(doc)
+
+        return closest_sales
+
     async def is_ad_post(self, chat_id: int, post_datatime: datetime) -> bool:
         # post_datatime = datetime(year=2024, month=4, day=1, hour=15, minute=21)
         str_date = self.format_date(post_datatime)
@@ -84,6 +102,7 @@ class Sales:
         sales = self.col.find({'date': date, 'time': time})
         r = [sale async for sale in sales]
         return r
+
     async def get_msg_markers(self, _id) -> List[str]:
         doc = await self.col.find_one({'_id': _id})
         return doc.get('markers')
@@ -108,6 +127,3 @@ class Sales:
     #
     #     if time_difference < -600:
     #         return
-
-
-

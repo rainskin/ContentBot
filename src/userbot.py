@@ -305,6 +305,14 @@ class Userbot:
         async for msg in app.get_chat_history(chat_id, limit):
             print(msg.text)
 
+    async def delete_messages(self, chat_id: int, msg_ids: list[int]):
+        app = self.app
+        try:
+            await app.start()
+        except ConnectionError:
+            pass
+
+        await app.delete_messages(chat_id, msg_ids)
     # async def create_tests(self, bot_id: int):
     #     app = self.app
     #     try:

@@ -84,20 +84,16 @@ async def func(msg: types.Message):
 
     logging.info(f'Начал обработку в {messages[0].chat.title}, кол-во сообщений {len(messages)}')
     date = messages[0].date
-    # await ad_manager.save_posts(date, chat_id, messages)
 
     closer_sale_id = await sales.get_closer_sale_id(date)
 
     if not closer_sale_id:
         return
 
-    sale_data = await sales.get_sale_data(closer_sale_id)
-    date = sale_data.get('date')
-    time = sale_data.get('time')
+    msg_date = messages[0].date
+    closest_sales = await sales.get_closest_sales(msg_date, 30)
 
-    sales_for_same_time = await sales.get_all_sales_by_date_and_time(date, time)
-
-    for sale in sales_for_same_time:
+    for sale in closest_sales:
         asyncio.create_task(process_sale(chat_id, messages, sale))
         await asyncio.sleep(3)
 
