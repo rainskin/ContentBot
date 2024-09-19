@@ -10,5 +10,6 @@ def setup():
     from . import add_sale
     from . import ad_schedule
     from . import channel_posts_handler
+    from . import debug
 
     from . import text_handler

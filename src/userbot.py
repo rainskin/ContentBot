@@ -21,8 +21,8 @@ import loader
 
 
 class Client(pyrogram.Client):
-    def __init__(self, session_string: str):
-        super().__init__('userbot', session_string=session_string)  # type: ignore
+    def __init__(self, session_string: str, no_updates: bool):
+        super().__init__('userbot', session_string=session_string, no_updates=no_updates)  # type: ignore
 
     # async def send_message(self):
     #     await self.send_message()
@@ -69,7 +69,7 @@ class Client(pyrogram.Client):
 class Userbot:
 
     def __init__(self):
-        self.app = Client(session_string=config.USERBOT_SESSION_STRING)
+        self.app = Client(session_string=config.USERBOT_SESSION_STRING, no_updates=True)
 
     async def send_message(self, chat_id: int | str, text: str):
         try:
