@@ -1,10 +1,13 @@
 import asyncio
 import datetime
 import logging
+import random
 from datetime import datetime
 from typing import List
 
+import pyrogram.errors
 from aiogram import types
+from aiogram.utils.exceptions import RetryAfter
 from bson import ObjectId
 from pymongo.errors import DuplicateKeyError
 
@@ -23,8 +26,11 @@ async def add_keyboard(chat_id: int, msg_id: int, closer_sale_id: ObjectId):
     keyboard_data = await sales.get_keyboard_data(closer_sale_id)
     if keyboard_data:
         kb = InlineKeyboardBuilder(keyboard_data)
-        await bot.edit_message_reply_markup(chat_id, msg_id, reply_markup=kb)
+        await asyncio.sleep(random.randint(1, 5))
 
+        await bot.edit_message_reply_markup(chat_id, msg_id, reply_markup=kb)
+    else:
+        print('клавы нет и не будет')
 
 async def is_same_markers(closer_sale_id: ObjectId, msg_markers: List[str]):
     closer_sale_msg_markers: list = await sales.get_msg_markers(closer_sale_id)
@@ -52,7 +58,11 @@ async def process_sale(chat_id: int, messages: list[types.Message], sale: dict):
     if not await is_same_markers(sale_id, markers):
         return
 
-    await add_keyboard(chat_id, messages[0].message_id, sale_id)
+    try:
+        await add_keyboard(chat_id, messages[0].message_id, sale_id)
+    except RetryAfter as e:
+        await asyncio.sleep(e.timeout)
+        await add_keyboard(chat_id, messages[0].message_id, sale_id)
 
     sale_msg_id, time = await sales.get_sale_msg_id_and_time_by_sale_id(sale_id)
     autodelete_time = await sales.get_autodelete_time(sale_id)

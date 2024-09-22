@@ -3,6 +3,7 @@ from aiogram.dispatcher import FSMContext
 
 import keyboards
 from config import SALE_GROUP_ID
+from handlers.ad_schedule.post_setting_callback_handlers import toggle_parameter
 from handlers.ad_schedule.schedule_ad import delete_messages
 from loader import dp, userbot, bot
 from states import States
@@ -34,6 +35,8 @@ async def _(msg: types.Message, state: FSMContext):
         except ValueError as e:
             await msg.answer(str(e))
             return
+
+        await toggle_parameter(msg.chat.id, state, inline_keyboard=True)
         await state.update_data(keyboard_data=keyboard_data, last_preview_msg_id=answer.message_id)
 
     except Exception as e:
@@ -49,3 +52,11 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     await state.update_data(service_msg_ids=[])
     await state.set_state(States.schedule_ad)
     await query.message.delete()
+
+@dp.callback_query_handler(state=States.take_inline_keyboard, text='cancel_current_action')
+async def _(query: types.CallbackQuery, state: FSMContext):
+    await query.answer('Действие отменено', show_alert=True)
+    await state.set_state(States.schedule_ad)
+    await query.message.delete()
+
+

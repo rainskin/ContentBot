@@ -1,28 +1,20 @@
-from datetime import datetime
+import re
 
 import pyrogram
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ContentType
-from pyrogram.enums import ParseMode
+from pyrogram.storage.sqlite_storage import get_input_peer
 
-import keyboards
-from loader import dp, bot, userbot
+from loader import dp, userbot
 from states import States
 from utils.check_admin_rights import is_superadmin
-from utils.time import get_current_datetime
-import re
 
 
 @dp.message_handler(commands='test')
 async def cmd_test(msg: types.Message, state: FSMContext):
     if not is_superadmin(msg.from_user.id):
         return
-
-
-    # await userbot.create_tests(bot.id)
-    # await state.set_state(States.test)
-    # await msg.answer('test', reply_markup=keyboards.test_kb)
 
 
 @dp.message_handler(state=States.test, content_types=ContentType.ANY)
@@ -43,3 +35,12 @@ def replace_emoji_tags(msg_html_text: str):
 # <tg-emoji emoji-id="6152103458209007684">☺️</tg-emoji>
 
 
+async def get_all_peers(storage):
+    # Извлекаем все пиры из базы данных
+    peers = storage.conn.execute("SELECT id, access_hash, type FROM peers").fetchall()
+
+    if not peers:
+        print("No peers found in storage")
+        return []
+
+    return [get_input_peer(*peer) for peer in peers]

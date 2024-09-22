@@ -17,8 +17,7 @@ async def request_inline_keyboard(query: types.CallbackQuery, state: FSMContext)
         await query.answer('Для альбомов и репостов клавиатура не поддерживается')
         return
 
-    answer = await query.message.answer('Отправь клавиатуру')
-    await toggle_parameter(query.message.chat.id, state, inline_keyboard=True)
+    answer = await query.message.answer('Отправь клавиатуру', reply_markup=keyboards.AddOneButton(keyboards.cancel_current_action))
 
     await state.update_data(service_msg_ids=[answer.message_id])
     await query.answer()

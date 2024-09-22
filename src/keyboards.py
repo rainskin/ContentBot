@@ -33,6 +33,9 @@ finish_schedule_kb = InlineKeyboardMarkup().add(accept_btn)
 done_btn = KeyboardButton('Готово')
 done_kb = ReplyKeyboardMarkup(resize_keyboard=True).add(done_btn)
 
+cancel_btn = InlineKeyboardButton('❌ Отменить', callback_data='cancel')
+cancel_current_action = InlineKeyboardButton('❌ Отменить', callback_data='cancel_current_action')
+
 
 # Yes or No buttons
 class YesOrNo(InlineKeyboardMarkup):
@@ -50,6 +53,13 @@ class ConfirmParsing(InlineKeyboardMarkup):
     def __init__(self):
         super().__init__()
         self.add(self.button)
+
+
+class AddOneButton(InlineKeyboardMarkup):
+
+    def __init__(self, button: InlineKeyboardButton):
+        super().__init__()
+        self.add(button)
 
 
 class DelAdmin(InlineKeyboardMarkup):
@@ -141,8 +151,8 @@ class NotificationOff(InlineKeyboardMarkup):
 
 
 class InlineKeyboardBuilder(InlineKeyboardMarkup):
-
     ok_btn = InlineKeyboardButton(text='✅ Готово', callback_data='accept_inline_keyboard')
+
     def __init__(self, keyboard_data: str, is_preview: bool = False):
         super().__init__()
         rows_data = keyboard_data.strip().split('\n')  # Разделяем по строкам для получения рядов
@@ -162,6 +172,7 @@ class InlineKeyboardBuilder(InlineKeyboardMarkup):
         if is_preview:
             self.add(self.ok_btn)
 
+
 class AdPostSettings(InlineKeyboardMarkup):
     sound_on = InlineKeyboardButton('🔔 Со звуком: Да', callback_data='toggle_notification')
     sound_of = InlineKeyboardButton('🔕 Со звуком: Нет', callback_data='toggle_notification')
@@ -171,9 +182,7 @@ class AdPostSettings(InlineKeyboardMarkup):
     add_inline_keyboard = InlineKeyboardButton('➕ Доб. кнопки', callback_data='add_inline_keyboard')
     remove_inline_keyboard = InlineKeyboardButton('➖ Убрать кнопки', callback_data='remove_inline_keyboard')
 
-
     start_schedule = InlineKeyboardButton('✅ Запланировать', callback_data='start_schedule')
-    cancel_btn = InlineKeyboardButton('❌ Отменить', callback_data='cancel')
 
     def __init__(self, drop_author: bool, notification: bool, inline_keyboard=False, auto_delete_timer: str = None):
         if auto_delete_timer:
@@ -188,10 +197,10 @@ class AdPostSettings(InlineKeyboardMarkup):
         notification_btn = self.sound_on if notification else self.sound_of
         author_btn = self.enable_author if drop_author else self.disable_author
         inline_keyboard_btn = self.remove_inline_keyboard if inline_keyboard else self.add_inline_keyboard
-        self.row(notification_btn, author_btn )
+        self.row(notification_btn, author_btn)
         self.row(inline_keyboard_btn)
         self.row(set_autodelete_timer)
-        self.row(self.start_schedule, self.cancel_btn)
+        self.row(self.start_schedule, cancel_btn)
 
 
 class AutodeleteTimerAmount(InlineKeyboardMarkup):
@@ -210,6 +219,7 @@ class AutodeleteTimerAmount(InlineKeyboardMarkup):
         self.row(self.minute_15, self.minute_30, self.hour_1)
         self.row(self.hour_24, self.hour_48, self.hour_72)
         self.row(self.without_autodelete)
+
 
 class AdDate(InlineKeyboardMarkup):
     today = InlineKeyboardButton('Сегодня', callback_data='today')

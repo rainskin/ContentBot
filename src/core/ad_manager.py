@@ -24,7 +24,8 @@ class AdManager:
         self.db = self.client[config.MONGO_DB_NAME]
         self.list_of_channels = self.db['list of channels']
         self.saved_posts = self.db['saved_posts']
-        self.published_posts = self.db['published_posts']
+        # self.published_posts = self.db['published_posts']
+        self.published_posts = self.db['test_published_posts']
         self.sales = self.db['sales']
         self.bot = loader.bot
 
@@ -75,6 +76,13 @@ class AdManager:
                 sale_msg_id = ad.get('sale_msg_id')
                 post_time = ad.get('time')
                 for chat_id, message_ids in ad['published_posts'].items():
+                    # # peer_info = await userbot.app.get_chat(chat_id)
+                    # await userbot.app.storage.update_peers([(
+                    #                             peer_info.id, peer_info.access_hash, peer_info.type, peer_info.username,
+                    #                             peer_info.phone_number)])
+                    # peer = await userbot.app.storage.get_peer_by_id(chat_id)
+                    # print(peer)
+                    # await self.delete_post(chat_id, message_ids, sale_msg_id, post_time)
                     try:
                         await self.delete_post(chat_id, message_ids, sale_msg_id, post_time)
 
@@ -95,10 +103,15 @@ class AdManager:
             await asyncio.sleep(60)
 
     async def delete_post(self, from_chat, msg_ids: list[int], sale_msg_id, post_time):
+        await userbot.delete_messages(from_chat, msg_ids)
         try:
+            ms = userbot.app.get_chat_history(from_chat, limit=1)
+            async for m in ms:
+                print(m.text)
             await userbot.delete_messages(from_chat, msg_ids)
         except pyrogram.errors.PeerIdInvalid as e:
-            logging.info(f'[400 PEER_ID_INVALID], пропускаю // {sale_msg_id}, {post_time}')
+            # logging.info(f'[400 PEER_ID_INVALID], пропускаю // {sale_msg_id}, {post_time}')
+            logging.info(f'{e} {sale_msg_id}, {post_time}')
             return
 
         for msg_id in msg_ids:

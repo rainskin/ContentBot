@@ -5,7 +5,7 @@ from aiogram import executor
 import background_tasks
 import handlers
 from core.ad_manager import ad_manager
-from loader import dp, bot
+from loader import dp, bot, userbot
 from utils.debug import check_memory_usage, check_task_amount
 
 patch_pyrogram()
@@ -18,6 +18,7 @@ async def on_startup(dp):
     asyncio.create_task(check_task_amount(60*60))
 
     # Запуск фоновых задач бота
+    await userbot.app.start()
     await background_tasks.start()
     await ad_manager.setup()
     await bot.delete_webhook()
