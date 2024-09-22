@@ -5,6 +5,7 @@ from typing import Iterable
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.utils.exceptions import MessageToDeleteNotFound
 
 import config
 import keyboards
@@ -100,7 +101,10 @@ async def delete_messages(chat_id: int, message_ids: int | Iterable[int]):
     message_ids = list(message_ids) if is_iterable else [message_ids]
 
     for message_id in message_ids:
-        await bot.delete_message(chat_id, message_id)
+        try:
+            await bot.delete_message(chat_id, message_id)
+        except MessageToDeleteNotFound:
+            pass
 
 
 async def send_report_about_scheduled_posts(chat_id: int, schedule_date: datetime, data: dict):
