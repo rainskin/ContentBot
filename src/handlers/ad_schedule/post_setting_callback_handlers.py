@@ -84,6 +84,7 @@ async def toggle_parameter(chat_id, state, drop_author=False, notification=False
         is_changed = True
 
     if is_changed:
+        print(inline_keyboard_value)
         await state.update_data(drop_author=drop_author_value, notification=notification_value, inline_keyboard=inline_keyboard_value)
         await bot.edit_message_reply_markup(chat_id, ad_title_msg_id, reply_markup=keyboards.AdPostSettings(drop_author=drop_author_value, notification=notification_value,
                                                                        inline_keyboard=inline_keyboard_value, auto_delete_timer=autodelete_timer_value))

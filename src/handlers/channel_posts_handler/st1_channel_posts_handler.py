@@ -24,14 +24,15 @@ from utils.msg_marker import get_marker
 
 async def add_keyboard(chat_id: int, msg_id: int, closer_sale_id: ObjectId):
     keyboard_data = await sales.get_keyboard_data(closer_sale_id)
-    if keyboard_data:
-        kb = InlineKeyboardBuilder(keyboard_data)
-        await asyncio.sleep(random.randint(1, 5))
+    print(keyboard_data, type(keyboard_data))
 
-        await bot.edit_message_reply_markup(chat_id, msg_id, reply_markup=kb)
-    else:
-        print('клавы нет и не будет')
+    if not keyboard_data:
+        return
 
+    kb = InlineKeyboardBuilder(keyboard_data)
+    await asyncio.sleep(random.randint(1, 5))
+
+    await bot.edit_message_reply_markup(chat_id, msg_id, reply_markup=kb)
 async def is_same_markers(closer_sale_id: ObjectId, msg_markers: List[str]):
     closer_sale_msg_markers: list = await sales.get_msg_markers(closer_sale_id)
 

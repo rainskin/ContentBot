@@ -39,6 +39,11 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     drop_author = not data['drop_author']
     notification = not data['notification']
     autodelete_timer: str = data.get('autodelete_timer')
+    keyboard_data = data.get('keyboard_data')
+    if not drop_author and keyboard_data:
+        data['keyboard_data'] = None
+
+
     notification_status_in_text = '🔕 Без звука' if notification else '🔔 Со звуком'
     drop_author_status_in_text = '🚷 Без автора' if drop_author else '👤 Репост'
 
@@ -139,6 +144,7 @@ async def update_scheduled_post_info(is_main_post: bool, data: dict, schedule_da
     link = data['link']  # !!!!
     title = data['title']
     message_markers: list = data['message_markers']
+
     keyboard_data = data.get('keyboard_data')
 
     autodelete_time_in_sec = str_time_to_seconds(autodelete_timer) if autodelete_timer else None
