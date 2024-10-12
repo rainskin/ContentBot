@@ -54,6 +54,11 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     schedule_date = await db.get_scheduled_post_datetime(sale_msg_id)
     schedule_date = schedule_date if is_main_post else schedule_date + timedelta(minutes=minute)
 
+    current_datetime = datetime.datetime.now()
+    if datetime.datetime.now() >= schedule_date:
+        schedule_date = current_datetime + timedelta(minutes=1)
+
+
     ad_title_text = ad_title_text.replace('принят',
                                           f'\n\n✅ <b>Запланирован</b>\n<i>{notification_status_in_text} | {drop_author_status_in_text}</i>\n'
                                           f'{autodelete_timer_in_text}')
