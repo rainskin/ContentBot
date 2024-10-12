@@ -5,7 +5,7 @@ from typing import Iterable
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.utils.exceptions import MessageToDeleteNotFound
+from aiogram.utils.exceptions import MessageToDeleteNotFound, MessageNotModified
 
 import config
 import keyboards
@@ -96,11 +96,13 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 async def _(query: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     sale_msg_id = data['sale_msg_id']
-
     sale_info = await db.is_sale_info_exist(sale_msg_id)
     ad_is_scheduled = await db.is_scheduled_posts_exist(sale_msg_id)
-    await bot.edit_message_reply_markup(query.message.chat.id, sale_msg_id,
-                                        reply_markup=keyboards.SaleSettings(sale_info, ad_is_scheduled))
+    try:
+        await bot.edit_message_reply_markup(query.message.chat.id, sale_msg_id, reply_markup=keyboards.SaleSettings(sale_info, ad_is_scheduled))
+    except MessageNotModified as e:
+        pass
+
     await query.answer('Действие отменено')
     await state.finish()
     await query.message.delete()
