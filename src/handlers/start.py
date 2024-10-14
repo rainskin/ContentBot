@@ -4,7 +4,7 @@ from aiogram.types import bot_command_scope
 
 import keyboards
 import texts
-from config import SALE_GROUP_ID
+from config import SALE_GROUP_ID, UPLOAD_CHANNEL_ID
 from core.db import users
 from loader import dp
 from utils.check_admin_rights import is_admin, is_superadmin
@@ -35,7 +35,8 @@ async def cmd_start(msg: types.Message, state: FSMContext):
             await register_user(msg)
 
     elif chat_type == 'supergroup' or chat_type == 'chat':
-        if chat_id != SALE_GROUP_ID:
+        is_service_group = chat_id == SALE_GROUP_ID or chat_id == UPLOAD_CHANNEL_ID
+        if not is_service_group:
             return
 
         await msg.answer("Бот перезапущен")
