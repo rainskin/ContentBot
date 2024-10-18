@@ -50,7 +50,10 @@ async def _(msg: types.Message, state: FSMContext) -> None:
             return
         except (RPCError, KeyError) as e:
             await msg.answer(f'❌Не удалось подписаться на {channel_name_with_link}.\n\n{e}', disable_web_page_preview=True)
-            continue
+            if e.args == 'Chat_admin_required':
+                pass
+            else:
+                continue
 
         except Exception as e:
             await msg.answer(f'что-то пошло не так\n\n{e}')
