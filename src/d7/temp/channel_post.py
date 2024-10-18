@@ -61,7 +61,6 @@ async def on_channel_post(msg: types.Message):
     if chat_id not in db.channels.get_ids():
         return
     msgs = await collect_media_group(msg)
-    print(len(msgs))
 
     # if chat_id not in db.get_ids_of_all_channels():
     #     return

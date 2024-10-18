@@ -3,17 +3,8 @@ from config import UPLOAD_CHANNEL_LINK
 cmd_start_text = """
 Привет! Поработаем?
 
-/parse - начать парсинг пикч
-/show - посмотреть загруженные пикчи
-
 /channels - управление каналами
-/admins - управление админами
 
-/count - посчитать посты в бд
-/upload - загрузка контента в бд
-/schedule - запланировать контент посты в канал
-
-/add_sale - добавить продажу
 """
 
 admin_commands = """

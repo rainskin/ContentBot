@@ -3,6 +3,7 @@ from aiogram import types
 import config
 import texts
 from config import SALE_GROUP_ID
+from core.db import users
 from loader import dp
 from states import States
 from utils.check_admin_rights import is_admin
@@ -14,7 +15,13 @@ async def _(msg: types.Message):
         await msg.answer('Нет доступа')
         return
 
-    if msg.chat.id != SALE_GROUP_ID:
+    channel_owner_id = msg.from_user.id
+    sale_group_id = await users.get_sale_group_id(channel_owner_id)
+
+    if not sale_group_id:
+        return
+
+    if msg.chat.id != sale_group_id:
         await msg.answer('Это пока недоступно здесь', disable_web_page_preview=True)
         return
 

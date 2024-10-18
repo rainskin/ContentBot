@@ -1,12 +1,10 @@
-from typing import List
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.types import ContentType
 
 import keyboards
-import texts
-from config import SALE_GROUP_ID
+from core import db
+from core.db import users
 from loader import dp, bot, list_of_channels
 from states import States
 from utils import links
@@ -15,8 +13,13 @@ from utils import links
 
 @dp.message_handler(content_types='any')
 async def _(msg: types.Message, state: FSMContext):
+    channel_owner_id = msg.from_user.id
+    sale_group_id = await users.get_sale_group_id(channel_owner_id)
 
-    if msg.chat.id != SALE_GROUP_ID:
+    if not sale_group_id:
+        return
+
+    if msg.chat.id != sale_group_id:
         return
 
     entities = msg.entities or msg.caption_entities
@@ -24,20 +27,25 @@ async def _(msg: types.Message, state: FSMContext):
     if not entities:
         return
 
+    user_id = msg.from_user.id
+    channel_owner_id = user_id
     channel_links = await links.get_links_from_msg(msg)
 
     channels = []
     channel_ids = []
 
+    user_channels = await db.channels.get_channels(user_id)
     for link in channel_links:
-        channel = list_of_channels.find_one({'link': link})
-        if not channel:
-            continue
+        for user_channel in user_channels:
+            channel_link = user_channel.get('link')
+            # channel = list_of_channels.find_one({'link': link})
+            if link != channel_link:
+                continue
 
-        title = channel['title']
-        _id = channel['id']
-        channel_ids.append(_id)
-        channels.append(title)
+            title = user_channel['title']
+            _id = user_channel['id']
+            channel_ids.append(_id)
+            channels.append(title)
 
     if channels:
         channels_in_text = "\n".join(links.add_links_to_titles(channels, channel_links))
@@ -51,7 +59,7 @@ async def _(msg: types.Message, state: FSMContext):
 
     await States.check_channels.set()
     await msg.delete()
-    await state.update_data(channels=channels, channel_ids=channel_ids, channel_links=channel_links)
+    await state.update_data(channel_owner_id=channel_owner_id, channels=channels, channel_ids=channel_ids, channel_links=channel_links)
 
 
 

@@ -1,11 +1,16 @@
 from datetime import datetime as dt, datetime
 from typing import List
 
+from core import db
 from loader import list_of_channels, sales, other_channels, ecchi_col, hentai_coll
 
 
 def get_ids_of_all_channels() -> List[int]:
     return list_of_channels.distinct('id')
+
+
+def get_all_channels():
+    return list_of_channels.find()
 
 
 def get_channels_title_by_id(ids: List[int]):
@@ -23,10 +28,11 @@ async def add_sale(
         sale_msg_text: str,
         date: List[int],
         time: str,
-        channel_ids: List[int]
+        channels: List[str],
+        channel_ids: List[int],
+        channel_owner_id: int,
 ):
     date = '-'.join([str(i) for i in date])
-    channels = get_channels_title_by_id(channel_ids)
     sale = {
         'salesman': salesman,
         'costumer': None,
@@ -36,6 +42,7 @@ async def add_sale(
         'time': time,
         'channels': channels,
         'channel_ids': channel_ids,
+        'channel_owner_id': channel_owner_id,
         'title': None,
         'link': None,
         'scheduled_posts': None,
@@ -49,6 +56,7 @@ async def add_sale(
 
 
 async def add_ad_post_info(
+        channel_owner_id: int,
         sale_msg_id: int,
         title: str,
         link: List[str],
@@ -60,7 +68,7 @@ async def add_ad_post_info(
 
 ):
     link = link[0] if link else None
-    sales.update_one({'sale_msg_id': sale_msg_id},
+    sales.update_one({'sale_msg_id': sale_msg_id, 'channel_owner_id': channel_owner_id},
                      {"$set":
                          {
                              'title': title,
@@ -75,7 +83,9 @@ async def add_ad_post_info(
 
 
 async def add_additional_sale(
+        channel_owner_id: int,
         sale_msg_id: int,
+        channels: list[str],
         date: str,
         time: str,
         title: str,
@@ -84,15 +94,15 @@ async def add_additional_sale(
         scheduled_posts: List[tuple],
         autodelete_timer: int
 ):
-    main_sale = sales.find_one({'sale_msg_id': sale_msg_id})
+    main_sale = sales.find_one({'sale_msg_id': sale_msg_id, 'channel_owner_id': channel_owner_id})
     channel_ids = main_sale['channel_ids']
-    channels = get_channels_title_by_id(channel_ids)
     sale = {
         'sale_msg_id': sale_msg_id,
         'date': date,
         'time': time,
         'channels': channels,
         'channel_ids': channel_ids,
+        'channel_owner_id': channel_owner_id,
         'title': title,
         'keyboard_data': keyboard_data,
         'markers': markers,
@@ -105,8 +115,10 @@ async def add_additional_sale(
 
 
 async def add_ad_additional_posts(
+        channel_owner_id: int,
         sale_msg_id: int,
         dt: datetime,
+        channels: list[str],
         title: str,
         keyboard_data: str,
         message_markers: list,
@@ -117,7 +129,7 @@ async def add_ad_additional_posts(
     date: str = f'{day}-{month}-{year}'
     time: str = f'{hour}:{minute:02d}'
 
-    sale = sales.find_one({'sale_msg_id': sale_msg_id})
+    sale = sales.find_one({'sale_msg_id': sale_msg_id, 'channel_owner_id': channel_owner_id})
     exists_post = sale['scheduled_posts']
 
     grouped_messages = {}
@@ -131,35 +143,36 @@ async def add_ad_additional_posts(
             grouped_messages[chat_id].append(msg_id)
 
     result = [(chat_id, msg_ids) for chat_id, msg_ids in grouped_messages.items()]
-    sales.update_one({'sale_msg_id': sale_msg_id},
+    sales.update_one({'sale_msg_id': sale_msg_id, 'channel_owner_id': channel_owner_id},
                      {"$set":
                          {
                              'scheduled_posts': result
                          }}
                      )
 
-    await add_additional_sale(sale_msg_id, date, time, title, keyboard_data, message_markers, scheduled_posts,
+    await add_additional_sale(channel_owner_id, sale_msg_id, channels, date, time, title, keyboard_data, message_markers, scheduled_posts,
                               autodelete_timer)
 
 
-async def add_customer_info(sale_msg_id: int, costumer: str, price: int, title: str):
-    sale_msg_text = await get_sale_msg_text(sale_msg_id)
-    sales.update_one({'sale_msg_id': sale_msg_id}, {"$set": {'costumer': costumer,
-                                                             'price': price,
-                                                             'other': {
-                                                                 'sale_msg_text': sale_msg_text,
-                                                                 'customer_and_price_title': title}
-                                                             }
-                                                    })
+async def add_customer_info(channel_owner_id: int, sale_msg_id: int, costumer: str, price: int, title: str):
+    sale_msg_text = await get_sale_msg_text(channel_owner_id, sale_msg_id)
+    sales.update_one({'sale_msg_id': sale_msg_id, 'channel_owner_id': channel_owner_id},
+                     {"$set": {'costumer': costumer,
+                               'price': price,
+                               'other': {
+                                   'sale_msg_text': sale_msg_text,
+                                   'customer_and_price_title': title}
+                               }
+                      })
 
 
-async def get_scheduled_posts(sale_msg_id: int) -> List[tuple]:
-    sale = sales.find_one({'sale_msg_id': sale_msg_id})
+async def get_scheduled_posts(channel_owner_id: int, sale_msg_id: int) -> List[tuple]:
+    sale = sales.find_one({'sale_msg_id': sale_msg_id, 'channel_owner_id': channel_owner_id})
     return sale['scheduled_posts']
 
 
-async def delete_scheduled_posts_info(sale_msg_id: int):
-    sales.update_one({'sale_msg_id': sale_msg_id},
+async def delete_scheduled_posts_info(channel_owner_id: int, sale_msg_id: int):
+    sales.update_one({'sale_msg_id': sale_msg_id, 'channel_owner_id': channel_owner_id},
 
                      {"$set": {'scheduled_posts': None,
                                'title': None,
@@ -171,20 +184,20 @@ async def delete_scheduled_posts_info(sale_msg_id: int):
                      )
 
 
-async def is_sale_info_exist(sale_msg_id: int):
-    return bool(sales.find_one({'sale_msg_id': sale_msg_id})['costumer'])
+async def is_sale_info_exist(channel_owner_id: int, sale_msg_id: int):
+    return bool(sales.find_one({'sale_msg_id': sale_msg_id, 'channel_owner_id': channel_owner_id})['costumer'])
 
 
-async def is_scheduled_posts_exist(sale_msg_id: int):
-    return bool(sales.find_one({'sale_msg_id': sale_msg_id})['scheduled_posts'])
+async def is_scheduled_posts_exist(channel_owner_id: int, sale_msg_id: int):
+    return bool(sales.find_one({'sale_msg_id': sale_msg_id, 'channel_owner_id': channel_owner_id})['scheduled_posts'])
 
 
-async def get_sale_msg_text(sale_msg_id: int) -> str:
-    return sales.find_one({'sale_msg_id': sale_msg_id})['other']['sale_msg_text']
+async def get_sale_msg_text(channel_owner_id: int, sale_msg_id: int) -> str:
+    return sales.find_one({'sale_msg_id': sale_msg_id, 'channel_owner_id': channel_owner_id})['other']['sale_msg_text']
 
 
-async def get_scheduled_post_datetime(sale_msg_id: int) -> datetime:
-    sale = sales.find_one({'sale_msg_id': sale_msg_id})
+async def get_scheduled_post_datetime(channel_owner_id: int, sale_msg_id: int) -> datetime:
+    sale = sales.find_one({'sale_msg_id': sale_msg_id, 'channel_owner_id': channel_owner_id})
     date: List[int] = [int(i) for i in sale['date'].split('-')]
     time: List[int] = [int(i) for i in sale['time'].split(':')]
     year, month, day = date[2], date[1], date[0]
@@ -192,12 +205,13 @@ async def get_scheduled_post_datetime(sale_msg_id: int) -> datetime:
     return datetime(year, month, day, hour, minute)
 
 
-async def delete_sale(sale_msg_id: int):
-    sales.delete_many({'sale_msg_id': sale_msg_id})
+async def delete_sale(channel_owner_id: int, sale_msg_id: int):
+    sales.delete_many({'sale_msg_id': sale_msg_id, 'channel_owner_id': channel_owner_id})
 
 
-async def delete_additional_posts_by_sale_id(sale_msg_id: int):
-    sales.delete_many({'sale_msg_id': sale_msg_id, 'is_main_post': False})
+async def delete_additional_posts_by_sale_id(channel_owner_id, sale_msg_id: int):
+    sales.delete_many({'sale_msg_id': sale_msg_id, 'channel_owner_id': channel_owner_id, 'is_main_post': False})
+
 
 async def count_content_posts_by_channel() -> List[tuple]:
     channel_ids = get_ids_of_all_channels()

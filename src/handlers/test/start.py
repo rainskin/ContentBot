@@ -6,21 +6,30 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import ContentType
 from pyrogram.storage.sqlite_storage import get_input_peer
 
-from loader import dp, userbot
+from core.ad_manager import ad_manager
+from core.db import users, channels
+from loader import dp, userbot, bot
 from states import States
 from utils.check_admin_rights import is_superadmin
+from utils.db import get_all_channels
 
 
 @dp.message_handler(commands='test')
 async def cmd_test(msg: types.Message, state: FSMContext):
+
     if not is_superadmin(msg.from_user.id):
         return
 
+    admin_rights = {
+        "can_delete_messages": True,
+        "can_edit_messages": True,
+        "can_post_messages": True
+    }
+    all_channels = get_all_channels()
 
 @dp.message_handler(state=States.test, content_types=ContentType.ANY)
 async def _(msg: types.Message, state: FSMContext):
     text = replace_emoji_tags(msg.html_text)
-    print(text)
     await userbot.send_message('me', text)
 
 

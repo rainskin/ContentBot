@@ -1,21 +1,25 @@
 
-
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 import keyboards
-from config import SALE_GROUP_ID
+from core.db import users
 from loader import dp, userbot, bot
 from states import States
 from utils import db
 from utils.check_admin_rights import is_salesman, is_admin
 from utils.db import delete_additional_posts_by_sale_id
-from utils.time import create_valid_date
 
 
 @dp.callback_query_handler(text='schedule_ad_post', state=None)
 async def _(query: types.CallbackQuery, state: FSMContext):
-    if query.message.chat.id != SALE_GROUP_ID:
+    channel_owner_id = query.from_user.id
+    sale_group_id = await users.get_sale_group_id(channel_owner_id)
+
+    if not sale_group_id:
+        return
+
+    if query.message.chat.id != sale_group_id:
         return
     sale_msg_id = query.message.message_id
 
@@ -32,7 +36,9 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
 @dp.callback_query_handler(text='schedule_additional_ad_post', state=None)
 async def _(query: types.CallbackQuery, state: FSMContext):
-    if query.message.chat.id != SALE_GROUP_ID:
+    channel_owner_id = query.from_user.id
+    sale_group_id = await users.get_sale_group_id(channel_owner_id)
+    if query.message.chat.id != sale_group_id:
         return
     sale_msg_id = query.message.message_id
 
@@ -68,17 +74,21 @@ async def _(msg: types.Message, state: FSMContext):
 
 @dp.callback_query_handler(text='delete_scheduled_posts', state=None)
 async def _(query: types.CallbackQuery):
-    if query.message.chat.id != SALE_GROUP_ID:
+    channel_owner_id = query.from_user.id
+    sale_group_id = await users.get_sale_group_id(channel_owner_id)
+    if query.message.chat.id != sale_group_id:
         return
     sale_msg_id = query.message.message_id
+    channel_owner_id = query.from_user.id
 
     if not is_salesman(query.from_user.first_name, sale_msg_id) and not is_admin(query.from_user.id):
+        # TODO replace is_admin checking on is_channel_owner check
         await query.answer('У тебя нет прав для управления чужими продажами')
         return
 
-    sale_info = await db.is_sale_info_exist(sale_msg_id)
+    sale_info = await db.is_sale_info_exist(channel_owner_id, sale_msg_id)
 
-    chats_and_messages = await db.get_scheduled_posts(sale_msg_id)
+    chats_and_messages = await db.get_scheduled_posts(channel_owner_id, sale_msg_id)
     count = 0
     for chat_id, msg_ids in chats_and_messages:
         await userbot.delete_scheduled_messages(chat_id, msg_ids)
@@ -86,6 +96,6 @@ async def _(query: types.CallbackQuery):
 
     if count == len(chats_and_messages):
         await query.message.edit_reply_markup(keyboards.SaleSettings(sale_info=sale_info))
-        await db.delete_scheduled_posts_info(query.message.message_id)
-        await delete_additional_posts_by_sale_id(sale_msg_id)
+        await db.delete_scheduled_posts_info(channel_owner_id, query.message.message_id)
+        await delete_additional_posts_by_sale_id(channel_owner_id, sale_msg_id)
         await query.answer()

@@ -1,4 +1,5 @@
 def setup():
+
     from . import start
     from . import parse
     from . import show
@@ -11,5 +12,6 @@ def setup():
     from . import ad_schedule
     from . import channel_posts_handler
     from . import debug
+    from . import join_to_chats
 
     from . import text_handler

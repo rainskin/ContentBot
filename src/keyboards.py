@@ -1,7 +1,6 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup, \
     ReplyKeyboardRemove
 
-from handlers.channels.start_command import show_channels
 from utils.callback_templates import autodelete_timer_is_template
 from utils.time import get_autodelete_time_from_str
 
@@ -70,10 +69,13 @@ class DelAdmin(InlineKeyboardMarkup):
         self.add(self.button)
 
 
-def create_channel_buttons(channels):
+def create_channel_buttons(channels: list[dict]):
     buttons = []
-    for channel in channels:
-        channel = InlineKeyboardButton(text=channel, callback_data=channels[channel]['id'])
+    for channel_info in channels:
+        title = channel_info.get('title')
+        _id = channel_info.get('id')
+
+        channel = InlineKeyboardButton(text=title, callback_data=_id)
         buttons.append(channel)
 
     return buttons
@@ -91,14 +93,13 @@ class ChannelServiceButtons(InlineKeyboardMarkup):
 
 
 class Channels(InlineKeyboardMarkup):
-    channels = show_channels()
-    channel_buttons = create_channel_buttons(channels)
 
-    buttons = channel_buttons
+    buttons = None
 
-    def __init__(self):
+    def __init__(self, channels: list[dict]):
         super().__init__()
 
+        self.buttons = create_channel_buttons(channels)
         row = []
         for button in self.buttons:
             row.append(button)
@@ -109,6 +110,9 @@ class Channels(InlineKeyboardMarkup):
             self.row(*row)
 
     def delete_channel(self, channel_id):
+        if not self.buttons:
+            return
+
         for button in self.buttons:
             if button.callback_data == channel_id:
                 self.buttons.remove(button)
@@ -121,8 +125,8 @@ class Channels(InlineKeyboardMarkup):
 class ChannelsWithServiceButtons(Channels, ChannelServiceButtons):
     service_buttons = ChannelServiceButtons.buttons
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, channels: list[dict]):
+        super().__init__(channels=channels)
 
         row = []
         for button in self.service_buttons:

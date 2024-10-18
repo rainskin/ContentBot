@@ -1,16 +1,10 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-import keyboards
-from config import SALE_GROUP_ID
 from handlers.ad_schedule.post_setting_callback_handlers import toggle_parameter
-from handlers.ad_schedule.schedule_ad import delete_messages
-from loader import dp, userbot, bot
+from loader import dp, bot
 from states import States
-from utils import db
 from utils.callback_templates import autodelete_timer_is_template
-from utils.check_admin_rights import is_salesman, is_admin
-from utils.time import get_time_from_msg_text
 from utils.timedelta_parser import parse_hours_and_minutes
 
 

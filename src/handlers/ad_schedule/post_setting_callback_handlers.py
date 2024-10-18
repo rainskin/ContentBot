@@ -2,11 +2,8 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 import keyboards
-from config import SALE_GROUP_ID
 from loader import dp, userbot, bot
 from states import States
-from utils import db
-from utils.check_admin_rights import is_salesman, is_admin
 
 
 async def request_inline_keyboard(query: types.CallbackQuery, state: FSMContext):
@@ -84,7 +81,6 @@ async def toggle_parameter(chat_id, state, drop_author=False, notification=False
         is_changed = True
 
     if is_changed:
-        print(inline_keyboard_value)
         await state.update_data(drop_author=drop_author_value, notification=notification_value, inline_keyboard=inline_keyboard_value)
         await bot.edit_message_reply_markup(chat_id, ad_title_msg_id, reply_markup=keyboards.AdPostSettings(drop_author=drop_author_value, notification=notification_value,
                                                                        inline_keyboard=inline_keyboard_value, auto_delete_timer=autodelete_timer_value))

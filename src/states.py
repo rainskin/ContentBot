@@ -47,5 +47,7 @@ class States(StatesGroup):
     # add additional ad post
     add_additional_ad_post = State()
 
+    # join to chats
+    waiting_chat_links = State()
     # test state
     test = State()

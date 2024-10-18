@@ -12,7 +12,6 @@ class Users:
         self.collection = self.db['users']
 
     async def add_user(self, name, username, user_id):
-
         doc = {
             'name': name,
             'username': username,
@@ -26,3 +25,7 @@ class Users:
     async def is_new(self, user_id):
         doc = await self.collection.find_one({'id': user_id})
         return not bool(doc)
+
+    async def get_sale_group_id(self, user_id):
+        doc = await self.collection.find_one({'id': user_id})
+        return doc.get('sale_group_id') if doc else None

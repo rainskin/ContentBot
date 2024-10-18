@@ -2,6 +2,7 @@ from aiogram import types
 
 import keyboards
 import texts
+from core.db import channels
 from loader import dp, other_channels, list_of_channels
 from states import States
 from utils.check_admin_rights import is_admin, is_superadmin
@@ -14,7 +15,9 @@ async def cmd_schedule(msg: types.Message):
         return
     else:
         # await count_posts_in_channels()
-        await msg.answer(text=texts.schedule_main, reply_markup=keyboards.Channels())
+        user_id = msg.from_user.id
+        user_channels = await channels.get_channels(user_id)
+        await msg.answer(text=texts.schedule_main, reply_markup=keyboards.Channels(user_channels))
         await States.schedule.set()
 
 

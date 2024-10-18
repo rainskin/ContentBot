@@ -2,7 +2,6 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 import keyboards
-from config import SALE_GROUP_ID
 from handlers.ad_schedule.post_setting_callback_handlers import toggle_parameter
 from handlers.ad_schedule.schedule_ad import delete_messages
 from loader import dp, userbot, bot

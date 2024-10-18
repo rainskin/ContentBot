@@ -30,7 +30,6 @@ async def _(msg: types.Message, state: FSMContext):
     str_minutes = f'{minutes:02d}'
     str_time = f'{hour}:{str_minutes}'
 
-    print(str_time)
 
     #
     day = data['day']
@@ -40,6 +39,7 @@ async def _(msg: types.Message, state: FSMContext):
     channels = data['channels']
     links = data['channel_links']
     channel_ids = data['channel_ids']
+    channel_owner_id = data['channel_owner_id']
     msg_with_date_id = data['msg_with_date_id']
     msg_ask_to_select_data_id = data['msg_ask_to_select_data_id']
 
@@ -59,7 +59,9 @@ async def _(msg: types.Message, state: FSMContext):
         sale_msg_text,
         [day, month, year],
         str_time,
-        channel_ids
+        channels,
+        channel_ids,
+        channel_owner_id,
     )
     await bot.delete_message(msg.chat.id, msg_with_date_id)
     await bot.delete_message(msg.chat.id, msg_ask_to_select_data_id)
