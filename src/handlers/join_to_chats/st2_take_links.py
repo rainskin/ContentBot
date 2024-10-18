@@ -36,7 +36,7 @@ async def _(msg: types.Message, state: FSMContext) -> None:
         channel_title = channel_info.get('title')
         link = make_invite_link(channel_link)
         channel_name_with_link = f'<a href="{channel_link}">{channel_title}</a>'
-        message = await msg.answer(f'⌛Пробую подписаться на {channel_name_with_link}')
+        message = await msg.answer(f'⌛Пробую подписаться на {channel_name_with_link}', disable_web_page_preview=True)
 
         try:
             await bot.get_chat_administrators(channel_id)
@@ -46,10 +46,10 @@ async def _(msg: types.Message, state: FSMContext) -> None:
         try:
             await userbot.app.join_chat(link)
         except exceptions.InviteHashExpired:
-            await msg.answer(f'❌ Ссылка: {link} не работает')
+            await msg.answer(f'❌🔗 Ссылка: {link} не работает')
             return
         except (RPCError, KeyError) as e:
-            await msg.answer(f'Не удалось подписаться на {channel_name_with_link}.\n\n{e}')
+            await msg.answer(f'❌Не удалось подписаться на {channel_name_with_link}.\n\n{e}', disable_web_page_preview=True)
             continue
 
         except Exception as e:
@@ -58,7 +58,7 @@ async def _(msg: types.Message, state: FSMContext) -> None:
 
         count += 1
 
-        await msg.answer(f'✅ Подписался на {channel_name_with_link}')
+        await msg.answer(f'✅ Подписался на {channel_name_with_link}', disable_web_page_preview=True)
 
         admin_rights = {
             "can_delete_messages": True,
@@ -69,7 +69,7 @@ async def _(msg: types.Message, state: FSMContext) -> None:
         try:
             await bot.promote_chat_member(channel_id, USERBOT_ID, **admin_rights)
         except Exception as e:
-            await msg.answer(f'Не удалось дать права администратор в канале {channel_name_with_link}.\n\n{e}')
+            await msg.answer(f'🔴 Не удалось дать права администратор в канале {channel_name_with_link}.\n\n{e}', disable_web_page_preview=True)
             continue
         await channels.set_userbot_status(channel_id, True)
         timeout = random.randint(0,  10)
