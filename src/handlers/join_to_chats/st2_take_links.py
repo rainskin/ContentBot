@@ -37,6 +37,12 @@ async def _(msg: types.Message, state: FSMContext) -> None:
         link = make_invite_link(channel_link)
         channel_name_with_link = f'<a href="{link}">{channel_title}</a>'
         message = await msg.answer(f'⌛Пробую подписаться на {channel_name_with_link}')
+
+        try:
+            await bot.get_chat_administrators(channel_id)
+        except Exception as e:
+            continue
+
         try:
             await userbot.app.join_chat(link)
         except exceptions.InviteHashExpired:
