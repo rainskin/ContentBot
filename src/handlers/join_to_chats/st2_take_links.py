@@ -35,7 +35,7 @@ async def _(msg: types.Message, state: FSMContext) -> None:
         channel_id = channel_info.get('id')
         channel_title = channel_info.get('title')
         link = make_invite_link(channel_link)
-        channel_name_with_link = f'<a href="{link}">{channel_title}</a>'
+        channel_name_with_link = f'<a href="{channel_link}">{channel_title}</a>'
         message = await msg.answer(f'⌛Пробую подписаться на {channel_name_with_link}')
 
         try:
