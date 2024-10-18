@@ -23,8 +23,8 @@ class AdManager:
         self.client = loader.ad_manager_db_client
         self.db = self.client[config.MONGO_DB_NAME]
         self.saved_posts = self.db['saved_posts']
-        # self.published_posts = self.db['published_posts']
-        self.published_posts = self.db['test_published_posts']
+        self.published_posts = self.db['published_posts']
+        # self.published_posts = self.db['test_published_posts']
         self.sales = self.db['sales']
         self.bot = loader.bot
 
