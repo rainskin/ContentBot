@@ -49,8 +49,8 @@ async def _(msg: types.Message, state: FSMContext) -> None:
             await msg.answer(f'❌ Ссылка: {link} не работает')
             return
         except (RPCError, KeyError) as e:
-            await msg.answer(f'Не удалось подписаться на {link}.\n\n{e}')
-            return
+            await msg.answer(f'Не удалось подписаться на {channel_name_with_link}.\n\n{e}')
+            continue
 
         except Exception as e:
             await msg.answer(f'что-то пошло не так\n\n{e}')
