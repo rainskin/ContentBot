@@ -70,7 +70,7 @@ async def _(msg: types.Message, state: FSMContext) -> None:
             await bot.promote_chat_member(channel_id, USERBOT_ID, **admin_rights)
         except Exception as e:
             await msg.answer(f'Не удалось дать права администратор в канале {channel_name_with_link}.\n\n{e}')
-            break
+            continue
         await channels.set_userbot_status(channel_id, True)
         timeout = random.randint(0,  10)
         await message.edit_text(f'Сплю {timeout} секунд')
