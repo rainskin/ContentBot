@@ -1,4 +1,4 @@
-PROJECT_NAME=content-bot
+PROJECT_NAME=dinoPoster-bot
 
 docker kill $PROJECT_NAME
 docker rm $PROJECT_NAME
