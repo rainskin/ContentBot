@@ -1,4 +1,4 @@
-PROJECT_NAME=dinoPoster-bot
+PROJECT_NAME=dinoposter-bot
 
 docker kill $PROJECT_NAME
 docker rm $PROJECT_NAME
