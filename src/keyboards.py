@@ -23,7 +23,7 @@ remove = ReplyKeyboardRemove()
 time_2 = InlineKeyboardButton('0, 15, 19', callback_data='0, 15, 19')
 time_3 = InlineKeyboardButton('11, 16, 21 (Alight)', callback_data='11, 16, 21')
 time_4 = InlineKeyboardButton('11, 15, 19, 23', callback_data='11, 15, 19, 23')
-time_5 = InlineKeyboardButton('10, 13, 16, 19, 22', callback_data='10, 13, 16, 19, 22')
+time_5 = InlineKeyboardButton('12, 15, 19, 23', callback_data='12, 15, 19, 23')
 choose_time_kb = InlineKeyboardMarkup(row_width=1).add(time_2, time_3, time_4, time_5)
 
 accept_btn = InlineKeyboardButton('Начать планирование', callback_data='accept')
